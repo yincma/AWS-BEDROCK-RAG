@@ -1,6 +1,6 @@
 """
-AWS Lambda文档处理器
-系统二：基于AWS Nova的企业级RAG知识问答系统
+AWS Lambda Document Processor
+System Two: Enterprise-grade RAG Knowledge Q&A System based on AWS Nova
 """
 
 import json
@@ -11,32 +11,32 @@ import boto3
 import uuid
 from typing import Dict, Any
 
-# 导入配置管理
+# Import configuration management
 try:
     from shared.config import get_config
     config = get_config()
 except ImportError:
     logger = logging.getLogger()
-    logger.warning("无法导入配置模块，使用环境变量")
+    logger.warning("Cannot import configuration module, using environment variables")
     config = None
 
-# 导入共享的Lambda基类
+# Import shared Lambda base class
 try:
     from shared.lambda_base import cors_handler
 except ImportError:
-    # 备用实现
+    # Fallback implementation
     def cors_handler(func):
         return func
 
-# 导入共享的CORS工具函数
+# Import shared CORS utility functions
 try:
     from shared.utils.cors import create_error_response, create_success_response
 except ImportError:
-    # 如果导入失败，立即定义备用函数
+    # If import fails, immediately define fallback functions
     import json
     
     def create_success_response(data, status_code=200):
-        """创建成功响应（备用实现）"""
+        """Create success response (fallback implementation)"""
         headers = config.get_cors_headers() if config else {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": os.getenv('CORS_ALLOW_ORIGIN', '*'),

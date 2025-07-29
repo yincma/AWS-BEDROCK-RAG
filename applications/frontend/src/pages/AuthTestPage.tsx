@@ -120,24 +120,24 @@ const AuthTestPage: React.FC = () => {
   return (
     <Box p={3}>
       <Typography variant="h4" gutterBottom>
-        认证和API测试页面
+        Authentication and API Test Page
       </Typography>
 
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom>
-          认证状态
+          Authentication Status
         </Typography>
         <Button onClick={checkAuthStatus} disabled={loading} variant="contained" sx={{ mb: 2 }}>
-          刷新认证状态
+          Refresh Authentication Status
         </Button>
         
         {authStatus.isAuthenticated ? (
           <Alert severity="success" sx={{ mb: 2 }}>
-            ✓ 用户已登录
+            ✓ User logged in
           </Alert>
         ) : (
           <Alert severity="error" sx={{ mb: 2 }}>
-            ✗ 用户未登录: {authStatus.error}
+            ✗ User not logged in: {authStatus.error}
           </Alert>
         )}
         
@@ -154,7 +154,7 @@ const AuthTestPage: React.FC = () => {
 
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom>
-          API测试
+          API Testing
         </Typography>
         
         <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
@@ -163,7 +163,7 @@ const AuthTestPage: React.FC = () => {
             disabled={loading || !authStatus.isAuthenticated} 
             variant="contained"
           >
-            测试 /documents API
+            Test /documents API
           </Button>
           
           <Button 
@@ -172,19 +172,19 @@ const AuthTestPage: React.FC = () => {
             variant="contained"
             color="secondary"
           >
-            测试 /status API
+            Test /status API
           </Button>
         </Box>
 
         {apiTestResult.error && (
           <Alert severity="error" sx={{ mb: 2 }}>
-            API调用失败: {apiTestResult.error}
+            API call failed: {apiTestResult.error}
           </Alert>
         )}
 
         {apiTestResult.success && (
           <Alert severity="success" sx={{ mb: 2 }}>
-            API调用成功! 状态码: {apiTestResult.status}
+            API call successful! Status code: {apiTestResult.status}
           </Alert>
         )}
 
@@ -202,7 +202,7 @@ const AuthTestPage: React.FC = () => {
 
       <Paper sx={{ p: 3 }}>
         <Typography variant="h6" gutterBottom>
-          调试命令（在浏览器控制台运行）
+          Debug Commands (run in browser console)
         </Typography>
         
         <TextField
@@ -211,10 +211,10 @@ const AuthTestPage: React.FC = () => {
           fullWidth
           variant="outlined"
           value={`
-// 检查Amplify配置
+// Check Amplify configuration
 console.log('Amplify Config:', window.Amplify);
 
-// 检查认证状态
+// Check authentication status
 import { fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
 const user = await getCurrentUser();
 console.log('Current User:', user);
@@ -223,7 +223,7 @@ const session = await fetchAuthSession();
 console.log('Session:', session);
 console.log('ID Token:', session.tokens?.idToken?.toString());
 
-// 手动测试API
+// Manual API testing
 const idToken = session.tokens?.idToken?.toString();
 const response = await fetch('https://vjywvai0e7.execute-api.us-east-1.amazonaws.com/dev/documents', {
   headers: {

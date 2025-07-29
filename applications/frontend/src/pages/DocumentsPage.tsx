@@ -90,14 +90,14 @@ const DocumentsPage: React.FC = () => {
           
           // 如果不是最后一次尝试，等待后重试
           if (attempt < retries - 1) {
-            console.log(`获取文档列表失败，${1}秒后重试... (尝试 ${attempt + 1}/${retries})`);
+            console.log(`Failed to get document list, retrying in ${1} second... (attempt ${attempt + 1}/${retries})`);
             await new Promise(resolve => setTimeout(resolve, 1000));
           }
         }
       }
       
-      // 所有重试都失败了
-      throw lastError || new Error('获取文档列表失败');
+      // All retries failed
+      throw lastError || new Error('Failed to get document list');
       
     } catch (error: any) {
       // If API fails, show empty state (this is expected for new deployments)
@@ -111,7 +111,7 @@ const DocumentsPage: React.FC = () => {
           'document-fetch',
           { 
             showNotification: false, // Don't show notification for initial load failure
-            userMessage: '无法加载文档列表'
+            userMessage: 'Unable to load document list'
           }
         );
       }
@@ -179,29 +179,29 @@ const DocumentsPage: React.FC = () => {
 
         // Show success notification
         errorService.showSuccessNotification(
-          '上传成功',
-          `文档 "${upload.name}" 上传成功，正在同步文档列表...`
+          'Upload Successful',
+          `Document "${upload.name}" uploaded successfully, syncing document list...`
         );
 
-        // 等待S3最终一致性，然后刷新文档列表
+        // Wait for S3 eventual consistency, then refresh document list
         setTimeout(async () => {
           try {
-            // 重新从服务器获取文档列表
+            // Re-fetch document list from server
             await fetchDocuments();
             
-            // 再次确认文档已同步
+            // Confirm documents have been synced
             errorService.showInfoNotification(
-              '同步完成',
-              '文档列表已更新'
+              'Sync Complete',
+              'Document list has been updated'
             );
           } catch (error) {
-            console.error('刷新文档列表失败:', error);
-            // 如果第一次失败，再试一次
+            console.error('Failed to refresh document list:', error);
+            // If first attempt fails, try again
             setTimeout(() => {
               fetchDocuments();
             }, 2000);
           }
-        }, 1500); // 等待1.5秒以确保S3同步
+        }, 1500); // Wait 1.5 seconds to ensure S3 sync
 
         // Remove from uploads after a short delay
         setTimeout(() => {
@@ -209,7 +209,7 @@ const DocumentsPage: React.FC = () => {
         }, 3000);
 
       } else {
-        throw new Error(response.error?.message || '上传失败');
+        throw new Error(response.error?.message || 'Upload failed');
       }
     } catch (error: any) {
       // Update upload status to error
@@ -217,7 +217,7 @@ const DocumentsPage: React.FC = () => {
         u.id === upload.id ? { 
           ...u, 
           status: 'error' as const, 
-          error: error.message || '上传失败'
+          error: error.message || 'Upload failed'
         } : u
       ) : []);
 
@@ -226,7 +226,7 @@ const DocumentsPage: React.FC = () => {
         'document-upload',
         { 
           showNotification: true,
-          userMessage: `文档 "${upload.name}" 上传失败`
+          userMessage: `Document "${upload.name}" upload failed`
         }
       );
     }
@@ -257,11 +257,11 @@ const DocumentsPage: React.FC = () => {
         setDocuments(prev => Array.isArray(prev) ? prev.filter(doc => doc.id !== documentId) : []);
         
         errorService.showSuccessNotification(
-          '删除成功',
-          `文档 "${document.name}" 已被删除`
+          'Delete Successful',
+          `Document "${document.name}" has been deleted`
         );
       } else {
-        throw new Error(response.error?.message || '删除失败');
+        throw new Error(response.error?.message || 'Delete failed');
       }
     } catch (error: any) {
       errorService.handleError(
@@ -269,7 +269,7 @@ const DocumentsPage: React.FC = () => {
         'document-delete',
         { 
           showNotification: true,
-          userMessage: '删除文档失败'
+          userMessage: 'Failed to delete document'
         }
       );
     }
@@ -278,16 +278,16 @@ const DocumentsPage: React.FC = () => {
   const handleRefresh = async () => {
     try {
       errorService.showInfoNotification(
-        '正在刷新',
-        '正在获取最新的文档列表...'
+        'Refreshing',
+        'Getting the latest document list...'
       );
       await fetchDocuments();
       errorService.showSuccessNotification(
-        '刷新成功',
-        '文档列表已更新'
+        'Refresh Successful',
+        'Document list has been updated'
       );
     } catch (error) {
-      console.error('刷新文档列表失败:', error);
+      console.error('Failed to refresh document list:', error);
     }
   };
 
@@ -611,13 +611,13 @@ const DocumentsPage: React.FC = () => {
             <input {...getInputProps()} />
             <UploadIcon sx={{ fontSize: 60, mb: 2, color: 'text.secondary' }} />
             <Typography variant="h6" gutterBottom>
-              {isDragActive ? '在此放置文件' : '拖放文件到此处'}
+              {isDragActive ? 'Drop files here' : 'Drag and drop files here'}
             </Typography>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              或点击浏览文件
+              or click to browse files
             </Typography>
             <Typography variant="caption" display="block" color="text.secondary">
-              支持 PDF, DOCX, TXT, MD, CSV, JSON 格式（每个文件最大 100MB）
+              Supports PDF, DOCX, TXT, MD, CSV, JSON formats (max 100MB per file)
             </Typography>
           </Box>
         </DialogContent>

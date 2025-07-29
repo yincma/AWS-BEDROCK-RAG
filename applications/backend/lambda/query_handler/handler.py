@@ -1,6 +1,6 @@
 """
-AWS Lambda查询处理器
-系统二：基于AWS Nova的企业级RAG知识问答系统
+AWS Lambda Query Handler
+System Two: Enterprise-grade RAG Knowledge Q&A System based on AWS Nova
 """
 
 import json
@@ -10,17 +10,17 @@ import time
 import boto3
 from typing import Dict, Any, List
 
-# 导入消息配置
+# Import message configuration
 try:
     from messages import get_message, get_knowledge_base_empty_response
 except ImportError:
-    # 如果无法导入，定义简单的回退函数
+    # If import fails, define simple fallback functions
     def get_message(key: str, **kwargs) -> str:
         messages = {
-            "knowledge_base_not_configured": "Knowledge Base未配置。请确保已正确部署AWS资源并配置环境变量。",
-            "knowledge_base_empty": "知识库中还没有任何文档。请先上传相关文档，然后再进行查询。",
-            "cannot_find_info": "抱歉，我无法找到相关信息来回答您的问题。",
-            "unknown_document": "未知文档",
+            "knowledge_base_not_configured": "Knowledge Base not configured. Please ensure AWS resources are properly deployed and environment variables are configured.",
+            "knowledge_base_empty": "There are no documents in the knowledge base yet. Please upload relevant documents first, then perform queries.",
+            "cannot_find_info": "Sorry, I cannot find relevant information to answer your question.",
+            "unknown_document": "Unknown document",
         }
         message = messages.get(key, key)
         if kwargs:
@@ -28,7 +28,7 @@ except ImportError:
         return message
     
     def get_knowledge_base_empty_response() -> str:
-        return "知识库中还没有任何文档。请先上传相关文档，然后再进行查询。\n\n您可以通过以下方式上传文档：\n1. 使用页面左侧的「文档管理」功能\n2. 将PDF、TXT或其他支持的文档拖拽上传\n3. 等待文档处理完成后再进行查询"
+        return "There are no documents in the knowledge base yet. Please upload relevant documents first, then perform queries.\n\nYou can upload documents in the following ways:\n1. Use the 'Document Management' feature on the left side of the page\n2. Drag and drop PDF, TXT or other supported documents\n3. Wait for document processing to complete before querying"
 
 # 导入共享的Lambda基类
 try:
@@ -76,7 +76,7 @@ try:
     config = get_config()
     log_level = config.features.log_level
 except ImportError:
-    logger.warning("无法导入配置模块，使用环境变量")
+    logger.warning("Cannot import configuration module, using environment variables")
     config = None
     log_level = os.getenv('LOG_LEVEL', 'INFO')
 

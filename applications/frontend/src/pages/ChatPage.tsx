@@ -319,7 +319,7 @@ const ChatPage: React.FC = () => {
                   <Box display="flex" alignItems="center" gap={1}>
                     <SourceIcon fontSize="small" color="primary" />
                     <Typography variant="body2" color="text.primary" fontWeight={500}>
-                      📖 参考来源 ({message.sources?.length || 0}个)
+                      📖 Reference Sources ({message.sources?.length || 0})
                     </Typography>
                   </Box>
                 </AccordionSummary>
@@ -347,7 +347,7 @@ const ChatPage: React.FC = () => {
                           <Box display="flex" alignItems="center" gap={1}>
                             <Chip
                               size="small"
-                              label={`相关度: ${(source.confidence * 100).toFixed(1)}%`}
+                              label={`Relevance: ${(source.confidence * 100).toFixed(1)}%`}
                               variant="filled"
                               color={source.confidence > 0.8 ? 'success' : source.confidence > 0.6 ? 'warning' : 'default'}
                               sx={{ fontWeight: 500 }}
@@ -355,7 +355,7 @@ const ChatPage: React.FC = () => {
                             {source.page && (
                               <Chip
                                 size="small"
-                                label={`第 ${source.page} 页`}
+                                label={`Page ${source.page}`}
                                 variant="outlined"
                                 color="info"
                               />

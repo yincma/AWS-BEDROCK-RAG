@@ -78,10 +78,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
   const navigate = useNavigate();
 
   const menuItems = [
-    { text: '💬 智能问答', path: '/chat', icon: <ChatIcon /> },
-    { text: '📚 文档管理', path: '/documents', icon: <DocumentIcon /> },
-    { text: '📈 系统监控', path: '/monitor', icon: <MonitorIcon /> },
-    { text: '⚙️ 系统设置', path: '/settings', icon: <SettingsIcon /> },
+    { text: '💬 Smart Q&A', path: '/chat', icon: <ChatIcon /> },
+    { text: '📚 Document Management', path: '/documents', icon: <DocumentIcon /> },
+    { text: '📈 System Monitor', path: '/monitor', icon: <MonitorIcon /> },
+    { text: '⚙️ System Settings', path: '/settings', icon: <SettingsIcon /> },
   ];
 
   const handleDrawerToggle = () => {
@@ -108,7 +108,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
       setSystemHealth({
         overall: 'error',
         components: {
-          'System': { status: 'error', error: '健康检查失败' }
+          'System': { status: 'error', error: 'Health check failed' }
         }
       });
     } finally {
@@ -118,20 +118,20 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
 
   const refreshKbStats = async () => {
     try {
-      // 获取文档列表
+      // Get document list
       const documentsResponse = await apiService.getDocuments();
       
-      // 获取知识库状态
+      // Get knowledge base status
       const statusResponse = await apiService.getKnowledgeBaseStatus();
       
       if (documentsResponse.success && documentsResponse.data && statusResponse.success && statusResponse.data) {
         const documents = documentsResponse.data;
         const statusData = statusResponse.data;
         
-        // 计算文件类型分布
+        // Calculate file type distribution
         const fileTypes: Record<string, number> = {};
         documents.forEach(doc => {
-          // 从文件名或类型中提取扩展名
+          // Extract extension from file name or type
           let extension = '';
           if (doc.name) {
             const match = doc.name.match(/\.([^.]+)$/);
@@ -140,7 +140,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
             }
           }
           
-          // 如果无法从文件名获取，尝试从content-type推断
+          // If unable to get from file name, try to infer from content-type
           if (!extension && doc.type) {
             const typeMapping: Record<string, string> = {
               'application/pdf': 'pdf',
@@ -158,8 +158,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
           }
         });
         
-        // 计算文档块数量 - 使用status中的信息或估算
-        const totalChunks = statusData.summary?.totalDocumentsIndexed || documents.length * 5; // 假设每个文档平均5个块
+        // Calculate document chunk count - use info from status or estimate
+        const totalChunks = statusData.summary?.totalDocumentsIndexed || documents.length * 5; // Assume 5 chunks per document on average
         
         const stats: KnowledgeBaseStats = {
           total_chunks: totalChunks,
@@ -172,7 +172,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
       }
     } catch (error) {
       console.error('Failed to fetch KB stats:', error);
-      // 如果API调用失败，设置空统计
+      // If API call fails, set empty statistics
       setKbStats({
         total_chunks: 0,
         unique_documents: 0,
@@ -219,10 +219,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
         textAlign: 'center'
       }}>
         <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-          🧠 企业RAG系统
+          🧠 Enterprise RAG System
         </Typography>
         <Typography variant="body2" sx={{ opacity: 0.9 }}>
-          基于AWS Bedrock的智能知识问答
+          Intelligent Knowledge Q&A based on AWS Bedrock
         </Typography>
       </Box>
 
@@ -260,7 +260,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
       <Box sx={{ p: 2, flex: 1 }}>
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
           <Typography variant="subtitle2" color="text.primary">
-            🔧 系统状态
+            🔧 System Status
           </Typography>
           <IconButton size="small" onClick={refreshSystemHealth} disabled={loading}>
             <RefreshIcon fontSize="small" />
@@ -273,8 +273,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
               <Box display="flex" alignItems="center" gap={1} mb={2}>
                 {getHealthIcon(systemHealth.overall)}
                 <Typography variant="body2" fontWeight={500}>
-                  {systemHealth.overall === 'healthy' ? '🟢 系统正常' : 
-                   systemHealth.overall === 'degraded' ? '🟡 部分异常' : '🔴 系统异常'}
+                  {systemHealth.overall === 'healthy' ? '🟢 System Normal' : 
+                   systemHealth.overall === 'degraded' ? '🟡 Partially Degraded' : '🔴 System Error'}
                 </Typography>
               </Box>
               
@@ -283,14 +283,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
                   expandIcon={<ExpandMoreIcon />}
                   sx={{ minHeight: 'auto', '& .MuiAccordionSummary-content': { margin: '8px 0' } }}
                 >
-                  <Typography variant="caption">组件详情</Typography>
+                  <Typography variant="caption">Component Details</Typography>
                 </AccordionSummary>
                 <AccordionDetails sx={{ pt: 0 }}>
                   {Object.entries(systemHealth.components).map(([name, status]) => (
                     <Box key={name} display="flex" alignItems="center" gap={1} mb={1}>
                       {getHealthIcon(status.status)}
                       <Typography variant="caption" sx={{ fontSize: 11 }}>
-                        {name}: {status.status === 'healthy' ? '正常' : status.error || '异常'}
+                        {name}: {status.status === 'healthy' ? 'Normal' : status.error || 'Error'}
                       </Typography>
                     </Box>
                   ))}
@@ -303,7 +303,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
         {/* Knowledge Base Stats */}
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
           <Typography variant="subtitle2" color="text.primary">
-            📊 知识库统计
+            📊 Knowledge Base Statistics
           </Typography>
           <IconButton size="small" onClick={refreshKbStats}>
             <RefreshIcon fontSize="small" />
@@ -315,15 +315,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
               <Box display="flex" alignItems="center" gap={1} mb={1}>
                 <StorageIcon fontSize="small" color="primary" />
-                <Typography variant="body2">{kbStats.unique_documents} 个文档</Typography>
+                <Typography variant="body2">{kbStats.unique_documents} Documents</Typography>
               </Box>
               <Box display="flex" alignItems="center" gap={1} mb={1}>
                 <AnalyticsIcon fontSize="small" color="secondary" />
-                <Typography variant="body2">{kbStats.total_chunks} 个文档块</Typography>
+                <Typography variant="body2">{kbStats.total_chunks} Document Chunks</Typography>
               </Box>
               
               <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-                文件类型分布:
+                File Type Distribution:
               </Typography>
               <Box display="flex" flexWrap="wrap" gap={0.5} mt={1}>
                 {Object.entries(kbStats.file_types).map(([type, count]) => (
@@ -365,7 +365,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
           onClick={onLogout}
           size="small"
         >
-          登出
+          Logout
         </Button>
       </Box>
     </Box>
@@ -392,7 +392,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout, children }) => 
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            企业RAG知识问答系统
+            Enterprise RAG Knowledge Q&A System
           </Typography>
         </Toolbar>
       </AppBar>

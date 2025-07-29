@@ -1,6 +1,6 @@
 """
-统一配置管理模块
-集中管理所有环境变量和配置项，避免硬编码
+Unified configuration management module
+Centrally manage all environment variables and configuration items, avoiding hard coding
 """
 import os
 import yaml
@@ -13,11 +13,11 @@ from functools import lru_cache
 
 @dataclass
 class APIConfig:
-    """API配置"""
+    """API configuration"""
     endpoint: str
     timeout: int = 30000
     stage: str = "dev"
-    # CORS配置
+    # CORS configuration
     cors_allow_origin: str = "*"
     cors_allow_methods: str = "GET,POST,PUT,DELETE,OPTIONS"
     cors_allow_headers: str = "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token"
@@ -25,14 +25,14 @@ class APIConfig:
 
 @dataclass
 class CognitoConfig:
-    """Cognito配置"""
+    """Cognito configuration"""
     user_pool_id: str
     client_id: str
     domain: str
 
 @dataclass
 class BedrockConfig:
-    """Bedrock配置"""
+    """Bedrock configuration"""
     model_id: str = "amazon.nova-pro-v1:0"
     embedding_model_id: str = "amazon.titan-embed-text-v1"
     knowledge_base_id: Optional[str] = None
@@ -42,7 +42,7 @@ class BedrockConfig:
 
 @dataclass
 class S3Config:
-    """S3配置"""
+    """S3 configuration"""
     document_bucket: str
     frontend_bucket: str
     document_prefix: str = "documents/"
@@ -296,7 +296,7 @@ class Config:
             'S3_BUCKET': self.s3.document_bucket,
             'LOG_LEVEL': self.features.log_level,
             'ENABLE_XRAY': str(self.features.enable_xray).lower(),
-            # CORS配置
+            # CORS configuration
             'CORS_ALLOW_ORIGIN': self.api.cors_allow_origin,
             'CORS_ALLOW_METHODS': self.api.cors_allow_methods,
             'CORS_ALLOW_HEADERS': self.api.cors_allow_headers,
