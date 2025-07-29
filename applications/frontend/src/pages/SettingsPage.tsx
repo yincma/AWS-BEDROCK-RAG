@@ -94,7 +94,7 @@ const SettingsPage: React.FC = () => {
     },
     ui_preferences: {
       theme: 'light',
-      language: 'zh-CN',
+      language: 'en-US',
       notifications_enabled: true,
       auto_refresh: true,
     },
@@ -111,10 +111,10 @@ const SettingsPage: React.FC = () => {
   const [hasChanges, setHasChanges] = useState(false);
 
   const availableModels = [
-    { id: 'us.amazon.nova-micro-v1:0', name: 'Nova Micro (文本专用)' },
-    { id: 'us.amazon.nova-lite-v1:0', name: 'Nova Lite (多模态快速)' },
-    { id: 'us.amazon.nova-pro-v1:0', name: 'Nova Pro (多模态平衡)' },
-    { id: 'us.amazon.nova-premier-v1:0', name: 'Nova Premier (多模态最强)' },
+    { id: 'us.amazon.nova-micro-v1:0', name: 'Nova Micro (Text Only)' },
+    { id: 'us.amazon.nova-lite-v1:0', name: 'Nova Lite (Multimodal Fast)' },
+    { id: 'us.amazon.nova-pro-v1:0', name: 'Nova Pro (Multimodal Balanced)' },
+    { id: 'us.amazon.nova-premier-v1:0', name: 'Nova Premier (Multimodal Powerful)' },
   ];
 
   const updateSettings = (section: keyof SystemSettings, key: string, value: any) => {
@@ -142,7 +142,7 @@ const SettingsPage: React.FC = () => {
       // Reset success message after 3 seconds
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error: any) {
-      setError('保存设置失败: ' + error.message);
+      setError('Failed to save settings: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -166,7 +166,7 @@ const SettingsPage: React.FC = () => {
       },
       ui_preferences: {
         theme: 'light',
-        language: 'zh-CN',
+        language: 'en-US',
         notifications_enabled: true,
         auto_refresh: true,
       },
@@ -193,10 +193,10 @@ const SettingsPage: React.FC = () => {
         textAlign: 'center'
       }}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
-          ⚙️ 系统设置
+          ⚙️ System Settings
         </Typography>
         <Typography variant="body1" sx={{ opacity: 0.9 }}>
-          配置RAG系统的各项参数和偏好设置
+          Configure RAG system parameters and preferences
         </Typography>
       </Box>
 
@@ -211,7 +211,7 @@ const SettingsPage: React.FC = () => {
         <Box>
           {hasChanges && (
             <Chip
-              label="有未保存的更改"
+              label="Unsaved changes"
               color="warning"
               variant="outlined"
               size="small"
@@ -224,7 +224,7 @@ const SettingsPage: React.FC = () => {
             startIcon={<RefreshIcon />}
             onClick={handleResetToDefaults}
           >
-            恢复默认
+            Restore Defaults
           </Button>
           <Button
             variant="contained"
@@ -232,7 +232,7 @@ const SettingsPage: React.FC = () => {
             onClick={handleSaveSettings}
             disabled={loading || !hasChanges}
           >
-            {loading ? '保存中...' : '保存设置'}
+            {loading ? 'Saving...' : 'Save Settings'}
           </Button>
         </Box>
       </Box>
@@ -244,11 +244,11 @@ const SettingsPage: React.FC = () => {
             <CardContent>
               <Box display="flex" alignItems="center" mb={3}>
                 <SearchIcon color="primary" sx={{ mr: 2 }} />
-                <Typography variant="h6">🔍 检索设置</Typography>
+                <Typography variant="h6">🔍 Retrieval Settings</Typography>
               </Box>
 
               <Box mb={3}>
-                <Typography gutterBottom>检索文档数量 (top_k)</Typography>
+                <Typography gutterBottom>Number of Documents to Retrieve (top_k)</Typography>
                 <Slider
                   value={settings.retrieval.top_k}
                   onChange={(_, value) => updateSettings('retrieval', 'top_k', value)}
@@ -259,12 +259,12 @@ const SettingsPage: React.FC = () => {
                   valueLabelDisplay="on"
                 />
                 <Typography variant="caption" color="text.secondary">
-                  控制每次查询返回的最相关文档数量
+                  Controls the number of most relevant documents returned per query
                 </Typography>
               </Box>
 
               <Box mb={3}>
-                <Typography gutterBottom>相似度阈值</Typography>
+                <Typography gutterBottom>Similarity Threshold</Typography>
                 <Slider
                   value={settings.retrieval.similarity_threshold}
                   onChange={(_, value) => updateSettings('retrieval', 'similarity_threshold', value)}
@@ -275,12 +275,12 @@ const SettingsPage: React.FC = () => {
                   valueLabelDisplay="on"
                 />
                 <Typography variant="caption" color="text.secondary">
-                  只返回相似度高于此阈值的文档
+                  Only return documents with similarity higher than this threshold
                 </Typography>
               </Box>
 
               <Box mb={3}>
-                <Typography gutterBottom>单文档最大块数</Typography>
+                <Typography gutterBottom>Max Chunks per Document</Typography>
                 <Slider
                   value={settings.retrieval.max_chunks_per_document}
                   onChange={(_, value) => updateSettings('retrieval', 'max_chunks_per_document', value)}
@@ -291,7 +291,7 @@ const SettingsPage: React.FC = () => {
                   valueLabelDisplay="on"
                 />
                 <Typography variant="caption" color="text.secondary">
-                  限制从单个文档返回的文本块数量
+                  Limit the number of text chunks returned from a single document
                 </Typography>
               </Box>
 
@@ -302,10 +302,10 @@ const SettingsPage: React.FC = () => {
                     onChange={(e) => updateSettings('retrieval', 'enable_reranking', e.target.checked)}
                   />
                 }
-                label="启用重排序"
+                label="Enable Reranking"
               />
               <Typography variant="caption" color="text.secondary" display="block">
-                使用更精确的模型对检索结果重新排序
+                Use a more accurate model to rerank retrieval results
               </Typography>
             </CardContent>
           </Card>
@@ -317,16 +317,16 @@ const SettingsPage: React.FC = () => {
             <CardContent>
               <Box display="flex" alignItems="center" mb={3}>
                 <PsychologyIcon color="primary" sx={{ mr: 2 }} />
-                <Typography variant="h6">🧠 模型设置</Typography>
+                <Typography variant="h6">🧠 Model Settings</Typography>
               </Box>
 
               <Box mb={3}>
                 <FormControl fullWidth>
-                  <InputLabel>模型选择</InputLabel>
+                  <InputLabel>Model Selection</InputLabel>
                   <Select
                     value={settings.model.model_id}
                     onChange={(e) => updateSettings('model', 'model_id', e.target.value)}
-                    label="模型选择"
+                    label="Model Selection"
                   >
                     {availableModels.map((model) => (
                       <MenuItem key={model.id} value={model.id}>
@@ -338,7 +338,7 @@ const SettingsPage: React.FC = () => {
               </Box>
 
               <Box mb={3}>
-                <Typography gutterBottom>Temperature (创造性)</Typography>
+                <Typography gutterBottom>Temperature (Creativity)</Typography>
                 <Slider
                   value={settings.model.temperature}
                   onChange={(_, value) => updateSettings('model', 'temperature', value)}
@@ -349,21 +349,21 @@ const SettingsPage: React.FC = () => {
                   valueLabelDisplay="on"
                 />
                 <Typography variant="caption" color="text.secondary">
-                  控制回答的随机性，值越高越有创造性
+                  Controls the randomness of responses, higher values are more creative
                 </Typography>
               </Box>
 
               <Box mb={3}>
                 <TextField
                   fullWidth
-                  label="最大输出长度"
+                  label="Max Output Length"
                   type="number"
                   value={settings.model.max_tokens}
                   onChange={(e) => updateSettings('model', 'max_tokens', parseInt(e.target.value))}
                   inputProps={{ min: 100, max: 4000 }}
                 />
                 <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-                  限制模型生成的最大token数量
+                  Limit the maximum number of tokens generated by the model
                 </Typography>
               </Box>
 
@@ -379,7 +379,7 @@ const SettingsPage: React.FC = () => {
                   valueLabelDisplay="on"
                 />
                 <Typography variant="caption" color="text.secondary">
-                  核采样参数，控制输出的多样性
+                  Nucleus sampling parameter, controls output diversity
                 </Typography>
               </Box>
             </CardContent>
@@ -392,33 +392,33 @@ const SettingsPage: React.FC = () => {
             <CardContent>
               <Box display="flex" alignItems="center" mb={3}>
                 <TuneIcon color="primary" sx={{ mr: 2 }} />
-                <Typography variant="h6">🎨 界面偏好</Typography>
+                <Typography variant="h6">🎨 UI Preferences</Typography>
               </Box>
 
               <Box mb={3}>
                 <FormControl fullWidth>
-                  <InputLabel>主题</InputLabel>
+                  <InputLabel>Theme</InputLabel>
                   <Select
                     value={settings.ui_preferences.theme}
                     onChange={(e) => updateSettings('ui_preferences', 'theme', e.target.value)}
-                    label="主题"
+                    label="Theme"
                   >
-                    <MenuItem value="light">浅色主题</MenuItem>
-                    <MenuItem value="dark">深色主题</MenuItem>
-                    <MenuItem value="auto">跟随系统</MenuItem>
+                    <MenuItem value="light">Light Theme</MenuItem>
+                    <MenuItem value="dark">Dark Theme</MenuItem>
+                    <MenuItem value="auto">Follow System</MenuItem>
                   </Select>
                 </FormControl>
               </Box>
 
               <Box mb={3}>
                 <FormControl fullWidth>
-                  <InputLabel>语言</InputLabel>
+                  <InputLabel>Language</InputLabel>
                   <Select
                     value={settings.ui_preferences.language}
                     onChange={(e) => updateSettings('ui_preferences', 'language', e.target.value)}
-                    label="语言"
+                    label="Language"
                   >
-                    <MenuItem value="zh-CN">简体中文</MenuItem>
+                    <MenuItem value="zh-CN">Simplified Chinese</MenuItem>
                     <MenuItem value="en-US">English</MenuItem>
                   </Select>
                 </FormControl>
@@ -432,7 +432,7 @@ const SettingsPage: React.FC = () => {
                       onChange={(e) => updateSettings('ui_preferences', 'notifications_enabled', e.target.checked)}
                     />
                   }
-                  label="启用通知"
+                  label="Enable Notifications"
                 />
                 <FormControlLabel
                   control={
@@ -441,7 +441,7 @@ const SettingsPage: React.FC = () => {
                       onChange={(e) => updateSettings('ui_preferences', 'auto_refresh', e.target.checked)}
                     />
                   }
-                  label="自动刷新数据"
+                  label="Auto Refresh Data"
                 />
               </FormGroup>
             </CardContent>
@@ -454,34 +454,34 @@ const SettingsPage: React.FC = () => {
             <CardContent>
               <Box display="flex" alignItems="center" mb={3}>
                 <SecurityIcon color="primary" sx={{ mr: 2 }} />
-                <Typography variant="h6">🔒 安全设置</Typography>
+                <Typography variant="h6">🔒 Security Settings</Typography>
               </Box>
 
               <Box mb={3}>
                 <TextField
                   fullWidth
-                  label="会话超时时间 (秒)"
+                  label="Session Timeout (seconds)"
                   type="number"
                   value={settings.security.session_timeout}
                   onChange={(e) => updateSettings('security', 'session_timeout', parseInt(e.target.value))}
                   inputProps={{ min: 300, max: 86400 }}
                 />
                 <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-                  用户无操作后自动登出的时间
+                  Time before automatic logout after user inactivity
                 </Typography>
               </Box>
 
               <Box mb={3}>
                 <TextField
                   fullWidth
-                  label="最大并发会话数"
+                  label="Max Concurrent Sessions"
                   type="number"
                   value={settings.security.max_concurrent_sessions}
                   onChange={(e) => updateSettings('security', 'max_concurrent_sessions', parseInt(e.target.value))}
                   inputProps={{ min: 1, max: 10 }}
                 />
                 <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-                  单个用户同时允许的最大会话数
+                  Maximum number of concurrent sessions allowed per user
                 </Typography>
               </Box>
 
@@ -492,10 +492,10 @@ const SettingsPage: React.FC = () => {
                     onChange={(e) => updateSettings('security', 'require_mfa', e.target.checked)}
                   />
                 }
-                label="要求多因素认证"
+                label="Require Multi-Factor Authentication"
               />
               <Typography variant="caption" color="text.secondary" display="block">
-                为所有用户启用多因素认证
+                Enable multi-factor authentication for all users
               </Typography>
             </CardContent>
           </Card>
@@ -506,19 +506,19 @@ const SettingsPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                🔧 高级设置
+                🔧 Advanced Settings
               </Typography>
               
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>API 配置</Typography>
+                  <Typography>API Configuration</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
                       <TextField
                         fullWidth
-                        label="API 基础 URL"
+                        label="API Base URL"
                         value="https://3ulb7g7jof.execute-api.us-east-1.amazonaws.com/dev"
                         disabled
                       />
@@ -526,7 +526,7 @@ const SettingsPage: React.FC = () => {
                     <Grid item xs={12} md={6}>
                       <TextField
                         fullWidth
-                        label="AWS 区域"
+                        label="AWS Region"
                         value="us-east-1"
                         disabled
                       />
@@ -537,14 +537,14 @@ const SettingsPage: React.FC = () => {
 
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>缓存设置</Typography>
+                  <Typography>Cache Settings</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
                       <TextField
                         fullWidth
-                        label="查询缓存时间 (秒)"
+                        label="Query Cache Time (seconds)"
                         type="number"
                         defaultValue={300}
                       />
@@ -552,7 +552,7 @@ const SettingsPage: React.FC = () => {
                     <Grid item xs={12} md={6}>
                       <TextField
                         fullWidth
-                        label="文档缓存时间 (秒)"
+                        label="Document Cache Time (seconds)"
                         type="number"
                         defaultValue={3600}
                       />
@@ -563,12 +563,12 @@ const SettingsPage: React.FC = () => {
 
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>日志设置</Typography>
+                  <Typography>Log Settings</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel>日志级别</InputLabel>
-                    <Select defaultValue="INFO" label="日志级别">
+                    <InputLabel>Log Level</InputLabel>
+                    <Select defaultValue="INFO" label="Log Level">
                       <MenuItem value="DEBUG">DEBUG</MenuItem>
                       <MenuItem value="INFO">INFO</MenuItem>
                       <MenuItem value="WARNING">WARNING</MenuItem>
@@ -577,7 +577,7 @@ const SettingsPage: React.FC = () => {
                   </FormControl>
                   <FormControlLabel
                     control={<Switch defaultChecked />}
-                    label="启用性能日志"
+                    label="Enable Performance Logging"
                   />
                 </AccordionDetails>
               </Accordion>
@@ -593,7 +593,7 @@ const SettingsPage: React.FC = () => {
         onClose={() => setSaveSuccess(false)}
       >
         <Alert severity="success" onClose={() => setSaveSuccess(false)}>
-          设置保存成功！
+          Settings saved successfully!
         </Alert>
       </Snackbar>
     </Container>

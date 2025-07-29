@@ -1,4 +1,4 @@
-# 主Terraform配置文件（模块化版本）
+# Main Terraform configuration file (modular version)
 
 terraform {
   required_version = ">= 1.0"
@@ -15,7 +15,7 @@ terraform {
   }
 }
 
-# AWS Provider配置
+# AWS Provider configuration
 provider "aws" {
   region = var.aws_region
 
@@ -24,7 +24,7 @@ provider "aws" {
   }
 }
 
-# 本地变量
+# Local variables
 locals {
   common_tags = {
     Project     = var.project_name
@@ -34,12 +34,12 @@ locals {
   }
 }
 
-# 随机ID（用于资源命名）
+# Random ID (for resource naming)
 resource "random_id" "unique" {
   byte_length = 4
 }
 
-# 网络模块
+# Networking module
 module "networking" {
   source = "./modules/networking"
 
@@ -55,7 +55,7 @@ module "networking" {
   common_tags          = local.common_tags
 }
 
-# 存储模块
+# Storage module
 module "storage" {
   source = "./modules/storage"
 
@@ -64,19 +64,19 @@ module "storage" {
   common_tags   = local.common_tags
   random_suffix = random_id.unique.hex
 
-  # Lambda函数ARN（用于S3事件通知）
+  # Lambda function ARN (for S3 event notifications)
   document_processor_lambda_name = module.document_processor.function_name
 
-  # 文档前缀配置
+  # Document prefix configuration
   document_prefix = var.document_prefix
 
-  # AWS区域
+  # AWS region
   aws_region = var.aws_region
 
-  # 依赖关系 - 确保Lambda先创建
+  # Dependencies - ensure Lambda is created first
 }
 
-# 安全模块
+# Security module
 module "security" {
   source = "./modules/security"
 
@@ -84,14 +84,14 @@ module "security" {
   environment  = var.environment
   common_tags  = local.common_tags
 
-  # VPC配置
+  # VPC configuration
   vpc_id = module.networking.vpc_id
 
   # Cognito ARN for IAM policy
   cognito_user_pool_arn = var.enable_cognito ? module.cognito.user_pool_arn : ""
 }
 
-# 认证模块 (Cognito)
+# Authentication module (Cognito)
 module "cognito" {
   source = "./modules/cognito"
 
@@ -99,7 +99,7 @@ module "cognito" {
   environment  = var.environment
   common_tags  = local.common_tags
 
-  # 认证配置
+  # Authentication configuration
   enable_cognito = var.enable_cognito
   cognito_callback_urls = [
     "http://localhost:3000/callback"
@@ -111,7 +111,7 @@ module "cognito" {
   cognito_mfa_configuration       = var.cognito_mfa_configuration
 }
 
-# Lambda函数 - 查询处理器（性能优化）
+# Lambda function - Query handler (performance optimized)
 module "query_handler" {
   source = "./modules/lambda"
 
@@ -121,7 +121,7 @@ module "query_handler" {
   memory_size   = var.lambda_memory_configurations["query_handler"].memory_size
   timeout       = var.lambda_memory_configurations["query_handler"].timeout
 
-  # 性能优化配置
+  # Performance optimization configuration
   reserved_concurrent_executions    = var.lambda_memory_configurations["query_handler"].reserved_concurrent_executions
   provisioned_concurrent_executions = var.enable_provisioned_concurrency ? var.lambda_memory_configurations["query_handler"].provisioned_concurrent_executions : 0
 
@@ -133,33 +133,33 @@ module "query_handler" {
   environment_variables = {
     ENVIRONMENT = var.environment
     REGION      = var.aws_region
-    # 移除 AWS_REGION，因为它是Lambda保留的环境变量
+    # Remove AWS_REGION as it's a reserved Lambda environment variable
     KNOWLEDGE_BASE_ID = module.bedrock.knowledge_base_id
     DATA_SOURCE_ID    = module.bedrock.data_source_id
     BEDROCK_MODEL_ID  = var.bedrock_model_id
     S3_BUCKET         = module.storage.document_bucket_name
     LOG_LEVEL         = var.log_level
-    # CORS配置
+    # CORS configuration
     CORS_ALLOW_ORIGIN  = var.cors_allow_origin
     CORS_ALLOW_METHODS = var.cors_allow_methods
     CORS_ALLOW_HEADERS = var.cors_allow_headers
-    # 文档处理配置
+    # Document processing configuration
     ALLOWED_FILE_EXTENSIONS      = var.allowed_file_extensions
     MAX_FILE_SIZE_MB             = var.max_file_size_mb
     DOCUMENT_PREFIX              = var.document_prefix
     PRESIGNED_URL_EXPIRY_SECONDS = var.presigned_url_expiry_seconds
-    # 性能优化环境变量
+    # Performance optimization environment variables
     ENABLE_LAMBDA_INSIGHTS  = var.enable_lambda_insights
     COLD_START_OPTIMIZATION = var.enable_cold_start_optimization
   }
 
-  # 启用X-Ray追踪
+  # Enable X-Ray tracing
   tracing_mode = var.enable_xray_tracing ? "Active" : "PassThrough"
 
   tags = local.common_tags
 }
 
-# Lambda函数 - 文档处理器
+# Lambda function - Document processor
 module "document_processor" {
   source = "./modules/lambda"
 
@@ -177,21 +177,21 @@ module "document_processor" {
   environment_variables = {
     ENVIRONMENT = var.environment
     REGION      = var.aws_region
-    # 移除 AWS_REGION，因为它是Lambda保留的环境变量
+    # Remove AWS_REGION as it's a reserved Lambda environment variable
     S3_BUCKET         = module.storage.document_bucket_name
     KNOWLEDGE_BASE_ID = module.bedrock.knowledge_base_id
     DATA_SOURCE_ID    = module.bedrock.data_source_id
     LOG_LEVEL         = var.log_level
-    # CORS配置
+    # CORS configuration
     CORS_ALLOW_ORIGIN  = var.cors_allow_origin
     CORS_ALLOW_METHODS = var.cors_allow_methods
     CORS_ALLOW_HEADERS = var.cors_allow_headers
-    # 文档处理配置
+    # Document processing configuration
     ALLOWED_FILE_EXTENSIONS      = var.allowed_file_extensions
     MAX_FILE_SIZE_MB             = var.max_file_size_mb
     DOCUMENT_PREFIX              = var.document_prefix
     PRESIGNED_URL_EXPIRY_SECONDS = var.presigned_url_expiry_seconds
-    # Lambda配置
+    # Lambda configuration
     LAMBDA_MEMORY_SIZE = var.lambda_memory_size
     LAMBDA_TIMEOUT     = var.lambda_timeout
   }
@@ -200,7 +200,7 @@ module "document_processor" {
 }
 
 # Commented out - using Cognito authorizer instead
-# # Lambda函数 - 认证器
+# # Lambda function - Authorizer
 # module "authorizer" {
 #   source = "./modules/lambda"
 #   
@@ -226,7 +226,7 @@ module "document_processor" {
 #   tags = local.common_tags
 # }
 
-# API Gateway模块
+# API Gateway module
 module "api_gateway" {
   source = "./modules/compute/api_gateway"
 
@@ -235,7 +235,7 @@ module "api_gateway" {
   aws_region   = var.aws_region
   common_tags  = local.common_tags
 
-  # Lambda函数名称映射
+  # Lambda function name mapping
   lambda_function_names = {
     query_handler      = module.query_handler.function_name
     document_processor = module.document_processor.function_name
@@ -243,7 +243,7 @@ module "api_gateway" {
     index_creator = module.index_creator.function_name
   }
 
-  # Lambda函数ARN映射
+  # Lambda function ARN mapping
   lambda_function_arns = {
     query_handler      = module.query_handler.function_arn
     document_processor = module.document_processor.function_arn
@@ -251,7 +251,7 @@ module "api_gateway" {
     index_creator = module.index_creator.function_arn
   }
 
-  # Lambda函数调用ARN映射
+  # Lambda function invoke ARN mapping
   lambda_function_invoke_arns = {
     query_handler      = module.query_handler.invoke_arn
     document_processor = module.document_processor.invoke_arn
@@ -259,7 +259,7 @@ module "api_gateway" {
     index_creator = module.index_creator.invoke_arn
   }
 
-  # Lambda函数源代码哈希映射
+  # Lambda function source code hash mapping
   lambda_source_code_hashes = {
     query_handler      = module.query_handler.source_code_hash
     document_processor = module.document_processor.source_code_hash
@@ -267,15 +267,15 @@ module "api_gateway" {
     index_creator = module.index_creator.source_code_hash
   }
 
-  # 认证配置
+  # Authentication configuration
   cognito_user_pool_arn = module.cognito.user_pool_arn
 
-  # CORS配置
+  # CORS configuration
   enable_cors          = true
   cors_allowed_origins = var.allowed_origins
 }
 
-# Bedrock Knowledge Base模块
+# Bedrock Knowledge Base module
 module "bedrock" {
   source = "./modules/bedrock"
 
@@ -284,18 +284,18 @@ module "bedrock" {
   aws_region   = var.aws_region
   common_tags  = local.common_tags
 
-  # S3配置
+  # S3 configuration
   document_bucket_name = module.storage.document_bucket_name
   document_bucket_arn  = module.storage.document_bucket_arn
 
-  # 模型配置
+  # Model configuration
   embedding_model_id = var.bedrock_embedding_model_id
 
-  # 启用 Bedrock Knowledge Base
+  # Enable Bedrock Knowledge Base
   enable_bedrock_knowledge_base = true
 }
 
-# Lambda层模块
+# Lambda layers module
 module "layers" {
   source = "./modules/compute/layers"
 
@@ -303,11 +303,11 @@ module "layers" {
   environment  = var.environment
   common_tags  = local.common_tags
 
-  # 层源码目录（可选）
+  # Layer source directory (optional)
   layer_source_dir = "${path.root}/../../dist"
 }
 
-# 前端模块
+# Frontend module
 module "frontend" {
   source = "./modules/frontend"
 
@@ -316,20 +316,20 @@ module "frontend" {
   aws_region   = var.aws_region
   common_tags  = local.common_tags
 
-  # S3存储桶
+  # S3 bucket
   frontend_bucket_name        = module.storage.frontend_bucket_name
   frontend_bucket_arn         = module.storage.frontend_bucket_arn
   frontend_bucket_domain_name = module.storage.frontend_bucket_domain_name
 
-  # API配置
+  # API configuration
   api_gateway_url = module.api_gateway.api_endpoint
 
-  # 认证配置
+  # Authentication configuration
   cognito_user_pool_id        = module.cognito.user_pool_id
   cognito_user_pool_client_id = module.cognito.user_pool_client_id
 }
 
-# 监控模块
+# Monitoring module
 module "monitoring" {
   source = "./modules/monitoring"
 
@@ -337,14 +337,14 @@ module "monitoring" {
   environment  = var.environment
   common_tags  = local.common_tags
 
-  # 告警配置
+  # Alarm configuration
   alarm_email = var.alarm_email
 
-  # API Gateway配置
+  # API Gateway configuration
   api_gateway_name  = "${var.project_name}-api-${var.environment}"
   api_gateway_stage = var.environment
 
-  # Lambda函数配置
+  # Lambda function configuration
   lambda_functions = [
     module.query_handler.function_name,
     module.document_processor.function_name,
@@ -352,17 +352,20 @@ module "monitoring" {
     module.index_creator.function_name
   ]
 
-  # 成本告警配置
+  # Cost alert configuration
   cost_alert_threshold = var.cost_alert_threshold
 
-  # X-Ray配置
+  # X-Ray configuration
   enable_xray_tracing = var.enable_xray_tracing
 
-  # Synthetics配置
+  # Synthetics configuration
   enable_synthetics = var.enable_synthetics
   api_endpoint      = module.api_gateway.api_endpoint
 
-  # 确保Lambda函数先创建
+  # Knowledge Base monitoring
+  knowledge_base_id = module.bedrock.knowledge_base_id
+
+  # Ensure Lambda functions are created first
   depends_on = [
     module.query_handler,
     module.document_processor,
@@ -371,7 +374,7 @@ module "monitoring" {
   ]
 }
 
-# Lambda函数 - 索引创建器（特殊用途）
+# Lambda function - Index creator (special purpose)
 module "index_creator" {
   source = "./modules/lambda"
 

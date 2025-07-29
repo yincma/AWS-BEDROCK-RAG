@@ -40,7 +40,11 @@ resource "aws_iam_role_policy" "bedrock_knowledge_base" {
         Effect = "Allow"
         Action = [
           "s3:GetObject",
-          "s3:ListBucket"
+          "s3:GetObjectVersion",
+          "s3:ListBucket",
+          "s3:GetBucketLocation",
+          "s3:GetBucketVersioning",
+          "s3:ListBucketVersions"
         ]
         Resource = [
           var.document_bucket_arn,
@@ -226,6 +230,8 @@ resource "aws_bedrockagent_data_source" "s3" {
     type = "S3"
     s3_configuration {
       bucket_arn = var.document_bucket_arn
+      # Add document prefix configuration to ensure only documents/ directory is scanned
+      inclusion_prefixes = ["documents/"]
     }
   }
 

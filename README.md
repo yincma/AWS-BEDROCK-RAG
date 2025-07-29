@@ -836,22 +836,6 @@ MIT License
 **Last Updated**: 2025-07-29  
 **Status**: Production Ready
 
-## 🧹 AWS Resource Management
-
-### Unified Cleanup Script
-This project provides a unified AWS resource management script `aws-cleanup.sh` that supports resource checking and cleanup functionality.
-
-```bash
-# Check resources
-./aws-cleanup.sh check
-
-# Clean resources
-./aws-cleanup.sh clean
-
-# Check first then clean (default)
-./aws-cleanup.sh
-```
-
 ---
 
 ### 📝 Documentation Version History

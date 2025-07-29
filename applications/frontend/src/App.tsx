@@ -21,16 +21,16 @@ import { authService, errorService } from './services';
 import { amplifyConfig } from './config/aws';
 import { apiService } from './services/api';
 
-// 动态加载配置
+// Dynamically load configuration
 const initializeApp = async () => {
   try {
-    // 尝试从 config.json 加载配置
+    // Try to load configuration from config.json
     const response = await fetch('/config.json');
     if (response.ok) {
       const config = await response.json();
       console.log('Loaded config from server:', config);
       
-      // 使用服务器配置更新 Amplify 配置
+      // Update Amplify configuration with server config
       const updatedConfig = {
         Auth: {
           Cognito: {
@@ -56,7 +56,7 @@ const initializeApp = async () => {
       Amplify.configure(updatedConfig);
       console.log('Amplify configured with server config');
       
-      // 同时更新 API Service 的配置
+      // Also update API Service configuration
       apiService.updateConfig({ apiEndpoint: config.apiEndpoint });
     } else {
       console.warn('Could not load config.json, using default configuration');
@@ -64,12 +64,12 @@ const initializeApp = async () => {
     }
   } catch (error) {
     console.error('Error loading config:', error);
-    // 使用默认配置
+    // Use default configuration
     Amplify.configure(amplifyConfig);
   }
 };
 
-// 初始化应用将在组件加载时进行
+// App initialization will happen when component loads
 
 // Initialize error service
 errorService.onError((error) => {
@@ -139,13 +139,13 @@ function App() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // 统一的初始化流程：先加载配置，然后检查认证状态
+    // Unified initialization flow: load config first, then check auth status
     const initialize = async () => {
       try {
-        // 加载配置
+        // Load configuration
         await initializeApp();
         
-        // 检查认证状态
+        // Check authentication status
         try {
           const currentUser = await authService.getCurrentUser();
           setUser(currentUser);

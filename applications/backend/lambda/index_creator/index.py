@@ -72,6 +72,50 @@ def wait_for_collection_ready(client, max_wait=60):
     
     return False
 
+def get_index_version(client, index_name: str) -> str:
+    """
+    获取现有索引的版本
+    """
+    try:
+        index_settings = client.indices.get_settings(index=index_name)
+        settings = index_settings.get(index_name, {}).get("settings", {}).get("index", {})
+        version = settings.get("bedrock_kb_index_version", "v1")  # 默认为v1（旧版本）
+        print(f"Current index version: {version}")
+        return version
+    except Exception as e:
+        print(f"Error getting index version: {str(e)}")
+        return "unknown"
+
+def validate_index_config(index_body: Dict[str, Any]) -> bool:
+    """
+    验证索引配置是否与Bedrock Knowledge Base兼容
+    """
+    try:
+        mappings = index_body.get("mappings", {})
+        properties = mappings.get("properties", {})
+        
+        # 验证必需的字段
+        required_fields = ["bedrock-knowledge-base-vector", "text"]
+        for field in required_fields:
+            if field not in properties:
+                print(f"Missing required field: {field}")
+                return False
+        
+        # metadata字段由Bedrock动态创建，不需要预验证
+        
+        # 验证向量字段配置
+        vector_config = properties.get("bedrock-knowledge-base-vector", {})
+        if vector_config.get("type") != "knn_vector":
+            print("Vector field must be of type 'knn_vector'")
+            return False
+        
+        print("Index configuration validation passed")
+        return True
+        
+    except Exception as e:
+        print(f"Error validating index configuration: {str(e)}")
+        return False
+
 def create_index_with_retry(client, index_name: str, index_body: Dict[str, Any], max_retries: int = 3) -> Dict[str, Any]:
     """
     创建索引并进行重试
@@ -146,8 +190,18 @@ def lambda_handler(event, context):
             exists = retry_with_backoff(check_index_exists, max_retries=2, initial_delay=2)
             if exists:
                 print(f"Index '{index_name}' already exists")
+                
+                # 检查索引版本
+                current_version = get_index_version(client, index_name)
+                target_version = "v3"  # 当前目标版本
+                
+                if current_version != target_version:
+                    print(f"Index version mismatch: current={current_version}, target={target_version}")
+                    print(f"Index needs to be recreated to apply new mapping configuration")
+                    force_recreate = True  # 强制重新创建以应用新的映射
+                
                 if force_recreate:
-                    print(f"Force recreate is enabled, deleting existing index...")
+                    print(f"Recreating index to apply updated configuration...")
                     try:
                         # 删除现有索引
                         def delete_index():
@@ -163,9 +217,11 @@ def lambda_handler(event, context):
                         print(f"Error deleting index: {str(del_e)}")
                         # 继续尝试创建
                 else:
+                    print(f"Index version is up to date ({current_version})")
                     return create_success_response({
-                        'message': 'Index already exists',
+                        'message': 'Index already exists with current version',
                         'index_name': index_name,
+                        'version': current_version,
                         'status': 'success'
                     })
         except Exception as e:
@@ -174,11 +230,16 @@ def lambda_handler(event, context):
         
         # Index configuration for Bedrock Knowledge Base
         # 使用更兼容的配置
+        # 索引版本：v3 - 移除metadata字段预定义，让Bedrock动态创建
+        INDEX_VERSION = "v3"
+        
         index_body = {
             "settings": {
                 "index": {
                     "knn": True,
-                    "knn.algo_param.ef_search": 512
+                    "knn.algo_param.ef_search": 512,
+                    # 添加版本信息到索引设置
+                    "bedrock_kb_index_version": INDEX_VERSION
                 }
             },
             "mappings": {
@@ -199,16 +260,18 @@ def lambda_handler(event, context):
                     },
                     "text": {
                         "type": "text"
-                    },
-                    "metadata": {
-                        "type": "object",
-                        "enabled": false  # 禁用对象解析，存储原始值
                     }
+                    # metadata字段不预定义，让Bedrock在首次索引时动态创建
+                    # 这避免了"object mapping tried to parse field as object, but found a concrete value"错误
                 }
             }
         }
         
         print(f"Creating index with configuration: {json.dumps(index_body)}")
+        
+        # Validate index configuration before creation
+        if not validate_index_config(index_body):
+            return create_error_response(400, "Invalid index configuration for Bedrock Knowledge Base")
         
         # Create the index with retry
         try:

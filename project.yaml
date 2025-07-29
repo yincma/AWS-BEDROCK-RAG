@@ -1,44 +1,44 @@
-# 项目配置文件
+# Project Configuration File
 project:
   name: enterprise-rag
   version: 2.0.0
-  description: 基于AWS Nova的企业级RAG知识问答系统
+  description: Enterprise RAG Knowledge Q&A System based on AWS Nova
 
 structure:
   applications:
     backend:
-      - lambda: Lambda函数代码
-      - layers: Lambda层
-      - shared: 共享代码库
+      - lambda: Lambda function code
+      - layers: Lambda layers
+      - shared: Shared code library
     frontend:
-      - React TypeScript应用
+      - React TypeScript application
   
   infrastructure:
     terraform:
       modules:
-        - networking: 网络模块（VPC、子网、安全组）
-        - compute: 计算模块（Lambda、API Gateway）
-        - storage: 存储模块（S3、OpenSearch）
-        - security: 安全模块（WAF、Cognito、IAM）
-        - monitoring: 监控模块（CloudWatch、X-Ray）
+        - networking: Network module (VPC, subnets, security groups)
+        - compute: Compute module (Lambda, API Gateway)
+        - storage: Storage module (S3, OpenSearch)
+        - security: Security module (WAF, Cognito, IAM)
+        - monitoring: Monitoring module (CloudWatch, X-Ray)
       environments:
-        - dev: 开发环境配置
-        - staging: 预发布环境配置
-        - prod: 生产环境配置
+        - dev: Development environment configuration
+        - staging: Staging environment configuration
+        - prod: Production environment configuration
   
   scripts:
-    deploy: 部署脚本
-    test: 测试脚本
-    utils: 工具脚本
+    deploy: Deployment scripts
+    test: Test scripts
+    utils: Utility scripts
   
   config:
-    environments: 环境配置文件
-    secrets: 密钥配置模板
+    environments: Environment configuration files
+    secrets: Secret configuration templates
   
   tests:
-    unit: 单元测试
-    integration: 集成测试
-    e2e: 端到端测试
+    unit: Unit tests
+    integration: Integration tests
+    e2e: End-to-end tests
 
 dependencies:
   python: ">=3.9"

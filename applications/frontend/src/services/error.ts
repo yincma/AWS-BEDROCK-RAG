@@ -138,39 +138,39 @@ class ErrorService {
     const lowerCode = code.toLowerCase();
     
     if (lowerCode.includes('network') || lowerCode.includes('fetch')) {
-      return '网络连接出现问题，请检查您的网络连接后重试';
+      return 'Network connection issue, please check your network connection and try again';
     }
     
     if (lowerCode.includes('timeout')) {
-      return '请求超时，请稍后重试';
+      return 'Request timeout, please try again later';
     }
     
     if (lowerCode.includes('auth') || lowerCode.includes('unauthorized')) {
-      return '身份验证失败，请重新登录';
+      return 'Authentication failed, please log in again';
     }
     
     if (lowerCode.includes('forbidden')) {
-      return '您没有权限执行此操作';
+      return 'You do not have permission to perform this operation';
     }
     
     if (lowerCode.includes('not_found')) {
-      return '未找到请求的资源';
+      return 'Requested resource not found';
     }
     
     if (lowerCode.includes('upload')) {
-      return '文件上传失败，请检查文件格式和大小后重试';
+      return 'File upload failed, please check the file format and size and try again';
     }
     
     if (lowerCode.includes('chat') || lowerCode.includes('query')) {
-      return '处理您的请求时出现问题，请重新发送消息';
+      return 'There was a problem processing your request, please resend the message';
     }
     
     if (lowerCode.includes('server') || lowerCode.includes('500')) {
-      return '服务器出现临时问题，请稍后重试';
+      return 'The server is experiencing temporary issues, please try again later';
     }
     
     if (lowerCode.includes('validation')) {
-      return '输入数据格式不正确，请检查后重试';
+      return 'Invalid input data format, please check and try again';
     }
     
     // Return original message for development, generic message for production
@@ -178,14 +178,14 @@ class ErrorService {
       return originalMessage;
     }
     
-    return '操作失败，请稍后重试';
+    return 'Operation failed, please try again later';
   }
 
   private showErrorNotification(error: AppError) {
     const notification: Notification = {
       id: `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       type: 'error',
-      title: '操作失败',
+      title: 'Operation Failed',
       message: error.user_message || error.message,
       timestamp: error.timestamp,
       read: false

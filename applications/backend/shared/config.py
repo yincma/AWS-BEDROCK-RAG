@@ -51,25 +51,25 @@ class S3Config:
 
 @dataclass
 class DocumentConfig:
-    """文档处理配置"""
+    """Document processing configuration"""
     allowed_file_extensions: List[str] = field(default_factory=lambda: ['.pdf', '.txt', '.docx', '.doc', '.md', '.csv', '.json'])
     max_file_size_mb: int = 100
     presigned_url_expiry_seconds: int = 900
     
     @property
     def max_file_size_bytes(self) -> int:
-        """获取最大文件大小（字节）"""
+        """Get maximum file size (bytes)"""
         return self.max_file_size_mb * 1024 * 1024
     
     def validate_file_extension(self, filename: str) -> bool:
-        """验证文件扩展名"""
+        """Validate file extension"""
         if not filename:
             return False
         return any(filename.lower().endswith(ext) for ext in self.allowed_file_extensions)
 
 @dataclass
 class FeaturesConfig:
-    """功能开关配置"""
+    """Feature toggle configuration"""
     enable_waf: bool = False
     enable_xray: bool = True
     enable_shield: bool = False
@@ -78,20 +78,20 @@ class FeaturesConfig:
 
 @dataclass
 class MonitoringConfig:
-    """监控配置"""
+    """Monitoring configuration"""
     cloudwatch_namespace: str
     alarm_email: Optional[str] = None
 
 @dataclass
 class LambdaConfig:
-    """Lambda配置"""
+    """Lambda configuration"""
     memory_size: int = 1024
     timeout: int = 300
     reserved_concurrent_executions: int = 5
 
 @dataclass
 class Config:
-    """统一配置管理"""
+    """Unified configuration management"""
     environment: str
     region: str
     api: APIConfig
@@ -107,18 +107,18 @@ class Config:
     
     @classmethod
     def load(cls, env: str = None) -> 'Config':
-        """加载环境配置（单例模式）"""
+        """Load environment configuration (singleton pattern)"""
         if cls._instance is not None:
             return cls._instance
             
         env = env or os.getenv('ENVIRONMENT', 'dev')
         
-        # 查找配置文件
+        # Find configuration file
         config_paths = [
             Path(f'config/environments/{env}.yaml'),
             Path(f'../config/environments/{env}.yaml'),
             Path(f'../../config/environments/{env}.yaml'),
-            Path(f'/opt/config/{env}.yaml'),  # Lambda环境
+            Path(f'/opt/config/{env}.yaml'),  # Lambda environment
         ]
         
         config_data = None
@@ -129,13 +129,13 @@ class Config:
                 break
         
         if config_data is None:
-            # 如果找不到配置文件，使用环境变量
+            # If configuration file not found, use environment variables
             config_data = cls._load_from_env()
         
-        # 替换环境变量
+        # Replace environment variables
         config_data = cls._substitute_env_vars(config_data)
         
-        # 创建配置对象
+        # Create configuration object
         config = cls._create_config(config_data)
         cls._instance = config
         
@@ -143,7 +143,7 @@ class Config:
     
     @staticmethod
     def _load_from_env() -> Dict[str, Any]:
-        """从环境变量加载配置"""
+        """Load configuration from environment variables"""
         return {
             'environment': os.getenv('ENVIRONMENT', 'dev'),
             'region': os.getenv('AWS_REGION', 'us-east-1'),
@@ -202,10 +202,10 @@ class Config:
     
     @staticmethod
     def _substitute_env_vars(config: Dict[str, Any]) -> Dict[str, Any]:
-        """递归替换配置中的环境变量"""
+        """Recursively replace environment variables in configuration"""
         def substitute(value):
             if isinstance(value, str):
-                # 查找${VAR_NAME}模式
+                # Find ${VAR_NAME} pattern
                 import re
                 pattern = r'\$\{([^}]+)\}'
                 
@@ -225,7 +225,7 @@ class Config:
     
     @classmethod
     def _create_config(cls, data: Dict[str, Any]) -> 'Config':
-        """从字典创建配置对象"""
+        """Create configuration object from dictionary"""
         return cls(
             environment=data['environment'],
             region=data['region'],
@@ -240,7 +240,7 @@ class Config:
         )
     
     def to_dict(self) -> Dict[str, Any]:
-        """转换为字典"""
+        """Convert to dictionary"""
         return {
             'environment': self.environment,
             'region': self.region,
@@ -285,11 +285,11 @@ class Config:
         }
     
     def get_lambda_environment_variables(self) -> Dict[str, str]:
-        """获取Lambda函数的环境变量"""
+        """Get Lambda function environment variables"""
         return {
             'ENVIRONMENT': self.environment,
             'REGION': self.region,
-            # 注意：不要设置 AWS_REGION，它是Lambda保留的环境变量
+            # Note: Do not set AWS_REGION, it's a reserved Lambda environment variable
             'KNOWLEDGE_BASE_ID': self.bedrock.knowledge_base_id or '',
             'DATA_SOURCE_ID': self.bedrock.data_source_id or '',
             'BEDROCK_MODEL_ID': self.bedrock.model_id,
@@ -301,18 +301,18 @@ class Config:
             'CORS_ALLOW_METHODS': self.api.cors_allow_methods,
             'CORS_ALLOW_HEADERS': self.api.cors_allow_headers,
             'CORS_ALLOW_CREDENTIALS': str(self.api.cors_allow_credentials).lower(),
-            # 文档处理配置
+            # Document processing configuration
             'ALLOWED_FILE_EXTENSIONS': ','.join(self.document.allowed_file_extensions),
             'MAX_FILE_SIZE_MB': str(self.document.max_file_size_mb),
             'DOCUMENT_PREFIX': self.s3.document_prefix,
             'PRESIGNED_URL_EXPIRY_SECONDS': str(self.document.presigned_url_expiry_seconds),
-            # Lambda配置
+            # Lambda configuration
             'LAMBDA_MEMORY_SIZE': str(self.lambda_config.memory_size),
             'LAMBDA_TIMEOUT': str(self.lambda_config.timeout)
         }
     
     def get_cors_headers(self) -> Dict[str, str]:
-        """获取CORS响应头"""
+        """Get CORS response headers"""
         headers = {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": self.api.cors_allow_origin,
@@ -324,11 +324,11 @@ class Config:
         return headers
     
     def get_s3_key(self, file_id: str, file_extension: str) -> str:
-        """生成S3对象键"""
+        """Generate S3 object key"""
         return f"{self.s3.document_prefix}{file_id}{file_extension}"
     
     def validate_required_config(self) -> None:
-        """验证必需的配置项"""
+        """Validate required configuration items"""
         required_configs = {
             'S3_BUCKET': self.s3.document_bucket,
             'AWS_REGION': self.region,
@@ -337,10 +337,10 @@ class Config:
         missing_configs = [key for key, value in required_configs.items() if not value]
         
         if missing_configs:
-            raise ValueError(f"缺少必需的配置项: {', '.join(missing_configs)}")
+            raise ValueError(f"Missing required configuration items: {', '.join(missing_configs)}")
     
     def get_config_summary(self) -> Dict[str, Any]:
-        """获取配置摘要（隐藏敏感信息）"""
+        """Get configuration summary (hide sensitive information)"""
         return {
             'project_name': self.environment,
             'environment': self.environment,
@@ -353,7 +353,7 @@ class Config:
             'enable_xray': self.features.enable_xray
         }
 
-# 快捷访问
+# Quick access
 def get_config(env: str = None) -> Config:
-    """获取配置实例"""
+    """Get configuration instance"""
     return Config.load(env)

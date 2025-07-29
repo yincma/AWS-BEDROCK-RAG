@@ -1,12 +1,12 @@
 /**
- * 前端性能优化工具集
- * 包含懒加载、缓存、防抖、节流等优化措施
+ * Frontend performance optimization toolkit
+ * Includes lazy loading, caching, debouncing, throttling and other optimization measures
  */
 
 import React, { lazy, Suspense, ComponentType, useState, useEffect, useRef, useCallback } from 'react';
 import { CircularProgress, Box } from '@mui/material';
 
-// 路由懒加载包装器
+// Route lazy loading wrapper
 export function lazyLoad<T extends ComponentType<any>>(
   importFunc: () => Promise<{ default: T }>,
   fallback: React.ReactNode = <LoadingFallback />
@@ -20,7 +20,7 @@ export function lazyLoad<T extends ComponentType<any>>(
   );
 }
 
-// 加载占位组件
+// Loading placeholder component
 function LoadingFallback() {
   return (
     <Box 
@@ -34,7 +34,7 @@ function LoadingFallback() {
   );
 }
 
-// 路由懒加载导出
+// Route lazy loading exports
 export const LazyChat = lazyLoad(
   () => import(/* webpackChunkName: "chat" */ '../pages/ChatPage')
 );
@@ -48,8 +48,8 @@ export const LazyLogin = lazyLoad(
 );
 
 /**
- * API请求缓存类
- * 提供内存缓存和请求去重功能
+ * API request cache class
+ * Provides memory caching and request deduplication functionality
  */
 export class ApiCache {
   private cache: Map<string, { data: any; timestamp: number; etag?: string }>;
@@ -66,7 +66,7 @@ export class ApiCache {
     const cached = this.cache.get(key);
     if (!cached) return null;
     
-    // 检查是否过期
+    // Check if expired
     if (Date.now() - cached.timestamp > this.ttl) {
       this.cache.delete(key);
       return null;
@@ -76,7 +76,7 @@ export class ApiCache {
   }
   
   set(key: string, data: any, etag?: string): void {
-    // 实施LRU策略
+    // Implement LRU strategy
     if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
       const firstKey = this.cache.keys().next().value;
       this.cache.delete(firstKey);
@@ -102,7 +102,7 @@ export class ApiCache {
     this.cache.delete(key);
   }
   
-  // 根据模式清除缓存
+  // Clear cache by pattern
   clearByPattern(pattern: RegExp): void {
     const keysToDelete: string[] = [];
     
@@ -116,12 +116,12 @@ export class ApiCache {
   }
 }
 
-// 全局缓存实例
+// Global cache instance
 export const apiCache = new ApiCache();
 
 /**
- * 请求去重管理器
- * 防止同时发起多个相同请求
+ * Request deduplicator manager
+ * Prevents multiple identical requests from being made simultaneously
  */
 class RequestDeduplicator {
   private pendingRequests: Map<string, Promise<any>> = new Map();
@@ -130,13 +130,13 @@ class RequestDeduplicator {
     key: string,
     requestFunc: () => Promise<T>
   ): Promise<T> {
-    // 检查是否有相同的请求正在进行
+    // Check if the same request is in progress
     const pending = this.pendingRequests.get(key);
     if (pending) {
       return pending;
     }
     
-    // 发起新请求
+    // Initiate new request
     const promise = requestFunc()
       .then(result => {
         this.pendingRequests.delete(key);
@@ -155,8 +155,8 @@ class RequestDeduplicator {
 const requestDeduplicator = new RequestDeduplicator();
 
 /**
- * 增强的fetch函数
- * 包含缓存、去重、重试等功能
+ * Enhanced fetch function
+ * Includes caching, deduplication, retry and other features
  */
 export async function enhancedFetch(
   url: string,
@@ -165,14 +165,14 @@ export async function enhancedFetch(
   const method = options.method || 'GET';
   const cacheKey = `${method}:${url}:${JSON.stringify(options.body || {})}`;
   
-  // GET请求检查缓存
+  // Check cache for GET requests
   if (method === 'GET') {
     const cached = apiCache.get(cacheKey);
     if (cached) {
       return Promise.resolve(cached);
     }
     
-    // 添加ETag支持
+    // Add ETag support
     const etag = apiCache.getEtag(cacheKey);
     if (etag) {
       options.headers = {
@@ -182,11 +182,11 @@ export async function enhancedFetch(
     }
   }
   
-  // 请求去重
+  // Request deduplication
   return requestDeduplicator.deduplicate(cacheKey, async () => {
     const response = await fetch(url, options);
     
-    // 处理304 Not Modified
+    // Handle 304 Not Modified
     if (response.status === 304) {
       const cached = apiCache.get(cacheKey);
       if (cached) {
@@ -200,7 +200,7 @@ export async function enhancedFetch(
     
     const data = await response.json();
     
-    // 缓存GET请求结果
+    // Cache GET request results
     if (method === 'GET') {
       const etag = response.headers.get('etag');
       apiCache.set(cacheKey, data, etag || undefined);
@@ -211,8 +211,8 @@ export async function enhancedFetch(
 }
 
 /**
- * 防抖函数
- * 延迟执行，减少频繁调用
+ * Debounce function
+ * Delay execution to reduce frequent calls
  */
 export function debounce<F extends (...args: any[]) => any>(
   func: F,
@@ -227,8 +227,8 @@ export function debounce<F extends (...args: any[]) => any>(
 }
 
 /**
- * 节流函数
- * 限制执行频率
+ * Throttle function
+ * Limit execution frequency
  */
 export function throttle<F extends (...args: any[]) => any>(
   func: F,
@@ -252,8 +252,8 @@ export function throttle<F extends (...args: any[]) => any>(
 }
 
 /**
- * 虚拟滚动Hook
- * 用于长列表性能优化
+ * Virtual scroll hook
+ * Used for long list performance optimization
  */
 export function useVirtualScroll<T>(
   items: T[],
@@ -286,7 +286,7 @@ export function useVirtualScroll<T>(
 }
 
 /**
- * 图片懒加载Hook
+ * Image lazy loading hook
  */
 export function useImageLazyLoad(threshold: number = 0.1) {
   const [isIntersecting, setIsIntersecting] = useState(false);
@@ -315,7 +315,7 @@ export function useImageLazyLoad(threshold: number = 0.1) {
 }
 
 /**
- * 性能监控类
+ * Performance monitoring class
  */
 export class PerformanceMonitor {
   private marks: Map<string, number> = new Map();
@@ -339,7 +339,7 @@ export class PerformanceMonitor {
     
     const duration = end - start;
     
-    // 发送性能数据（可以集成到分析服务）
+    // Send performance data (can be integrated with analytics service)
     if (window.gtag) {
       window.gtag('event', 'timing_complete', {
         name,
@@ -350,7 +350,7 @@ export class PerformanceMonitor {
     return duration;
   }
   
-  // 监控组件渲染时间
+  // Monitor component render time
   measureComponent(componentName: string): () => void {
     const startMark = `${componentName}_start`;
     this.mark(startMark);
@@ -367,8 +367,8 @@ export class PerformanceMonitor {
 export const performanceMonitor = new PerformanceMonitor();
 
 /**
- * Web Worker管理器
- * 用于将计算密集型任务移至后台线程
+ * Web Worker manager
+ * Used to move compute-intensive tasks to background threads
  */
 export class WorkerManager {
   private workers: Map<string, Worker> = new Map();
@@ -426,7 +426,7 @@ export class WorkerManager {
 }
 
 
-// 扩展window类型以支持gtag
+// Extend window type to support gtag
 declare global {
   interface Window {
     gtag?: (...args: any[]) => void;

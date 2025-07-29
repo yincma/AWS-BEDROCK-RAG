@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * 从环境变量生成 config.json 文件
- * 避免硬编码配置值
+ * Generate config.json file from environment variables
+ * Avoid hardcoding configuration values
  */
 
 const fs = require('fs');
 const path = require('path');
 
-// 从环境变量或 .env 文件读取配置
+// Read configuration from environment variables or .env file
 require('dotenv').config();
 
 const config = {
@@ -19,21 +19,21 @@ const config = {
   userPoolClientId: process.env.REACT_APP_USER_POOL_CLIENT_ID || ''
 };
 
-// 验证必需的配置
+// Validate required configuration
 const requiredFields = ['apiEndpoint', 'userPoolId', 'userPoolClientId'];
 const missingFields = requiredFields.filter(field => !config[field]);
 
 if (missingFields.length > 0) {
-  console.error('错误：缺少必需的环境变量：');
+  console.error('Error: Missing required environment variables:');
   missingFields.forEach(field => {
     console.error(`  - REACT_APP_${field.replace(/([A-Z])/g, '_$1').toUpperCase()}`);
   });
   process.exit(1);
 }
 
-// 写入 config.json
+// Write config.json
 const configPath = path.join(__dirname, '..', 'public', 'config.json');
 fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n');
 
-console.log('✅ 已生成 config.json：');
+console.log('✅ Generated config.json:');
 console.log(JSON.stringify(config, null, 2));

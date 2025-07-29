@@ -26,7 +26,7 @@ class ApiService implements ApiClient {
   private defaultConfig: RequestConfig;
 
   constructor() {
-    // 初始使用默认配置
+    // Initially use default configuration
     this.baseURL = apiConfig.baseURL;
     this.defaultConfig = {
       timeout: apiConfig.timeout,
@@ -37,7 +37,7 @@ class ApiService implements ApiClient {
     };
   }
 
-  // 更新API配置
+  // Update API configuration
   updateConfig(config: { apiEndpoint?: string }) {
     if (config.apiEndpoint) {
       this.baseURL = config.apiEndpoint;
@@ -53,12 +53,12 @@ class ApiService implements ApiClient {
         hasAccessToken: !!session.tokens?.accessToken,
       });
       
-      // 使用 ID Token 用于 API Gateway 认证
+      // Use ID Token for API Gateway authentication
       const token = session.tokens?.idToken?.toString();
       
       if (token) {
         console.log('Using ID token for authorization');
-        // 调试：打印token的前20个字符
+        // Debug: print first 20 characters of token
         console.log('Token preview:', token.substring(0, 20) + '...');
         return {
           'Authorization': `Bearer ${token}`,
@@ -126,25 +126,25 @@ class ApiService implements ApiClient {
             headers: Object.fromEntries(response.headers.entries())
           });
           
-          // 创建更详细的错误消息
+          // Create more detailed error message
           let errorMessage = `HTTP ${response.status}`;
           
           if (response.status === 401) {
-            errorMessage = '认证失败：请重新登录';
+            errorMessage = 'Authentication failed: Please log in again';
           } else if (response.status === 403) {
-            errorMessage = '权限不足：您没有访问此资源的权限';
+            errorMessage = 'Access denied: You do not have permission to access this resource';
           } else if (response.status === 404) {
-            errorMessage = 'API端点未找到：请检查服务配置';
+            errorMessage = 'API endpoint not found: Please check service configuration';
           } else if (response.status === 500) {
-            errorMessage = '服务器内部错误：请稍后重试';
+            errorMessage = 'Internal server error: Please try again later';
           } else if (response.status === 502 || response.status === 503) {
-            errorMessage = '服务暂时不可用：后端服务可能未启动';
+            errorMessage = 'Service temporarily unavailable: Backend service may not be running';
           } else if (errorData.message) {
             errorMessage = errorData.message;
           } else if (errorData.error) {
             errorMessage = errorData.error;
           } else {
-            errorMessage = `请求失败 (${response.status}): ${response.statusText}`;
+            errorMessage = `Request failed (${response.status}): ${response.statusText}`;
           }
           
           const error = new Error(errorMessage);
@@ -306,7 +306,7 @@ class ApiService implements ApiClient {
 
   async uploadDocument(file: File, onProgress?: (progress: number) => void): Promise<ApiResponse<Document>> {
     try {
-      // 第一阶段：获取预签名URL
+      // Phase 1: Get presigned URL
       const uploadRequest = {
         filename: file.name,
         contentType: file.type,
@@ -322,20 +322,20 @@ class ApiService implements ApiClient {
         message: string;
       }>(apiConfig.endpoints.upload, uploadRequest);
 
-      console.log('预签名URL响应:', JSON.stringify(presignedResponse, null, 2));
+      console.log('Presigned URL response:', JSON.stringify(presignedResponse, null, 2));
 
       if (!presignedResponse.success || !presignedResponse.data) {
-        throw new Error('获取上传URL失败');
+        throw new Error('Failed to get upload URL');
       }
 
       const { uploadUrl, fileId, s3Key } = presignedResponse.data;
       
       if (!uploadUrl) {
         console.error('uploadUrl is undefined in response:', presignedResponse);
-        throw new Error('预签名URL为空');
+        throw new Error('Presigned URL is empty');
       }
 
-      // 第二阶段：使用预签名URL上传文件到S3
+      // Phase 2: Upload file to S3 using presigned URL
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         
@@ -349,14 +349,14 @@ class ApiService implements ApiClient {
         }
         
         xhr.addEventListener('load', () => {
-          console.log(`XHR加载完成 - Status: ${xhr.status}, StatusText: ${xhr.statusText}`);
+          console.log(`XHR load completed - Status: ${xhr.status}, StatusText: ${xhr.statusText}`);
           console.log(`Response Headers: ${xhr.getAllResponseHeaders()}`);
           console.log(`Response Text: ${xhr.responseText}`);
           
           if (xhr.status >= 200 && xhr.status < 300) {
-            console.log(`文件上传到S3成功: ${file.name}, Status: ${xhr.status}`);
+            console.log(`File upload to S3 successful: ${file.name}, Status: ${xhr.status}`);
             
-            // S3上传成功，返回文档信息
+            // S3 upload successful, return document info
             const documentData: Document = {
               id: fileId,
               name: file.name,
@@ -378,41 +378,41 @@ class ApiService implements ApiClient {
               data: documentData
             });
           } else {
-            console.error(`S3上传失败: Status ${xhr.status}, Response: ${xhr.responseText}`);
-            reject(new Error(`上传到S3失败 (${xhr.status}): ${xhr.statusText || '未知错误'}`));
+            console.error(`S3 upload failed: Status ${xhr.status}, Response: ${xhr.responseText}`);
+            reject(new Error(`Upload to S3 failed (${xhr.status}): ${xhr.statusText || 'Unknown error'}`));
           }
         });
         
         xhr.addEventListener('error', () => {
-          console.error('文件上传网络错误');
-          reject(new Error('文件上传失败：网络错误'));
+          console.error('File upload network error');
+          reject(new Error('File upload failed: Network error'));
         });
         
         xhr.addEventListener('timeout', () => {
-          console.error('文件上传超时');
-          reject(new Error('文件上传失败：请求超时'));
+          console.error('File upload timeout');
+          reject(new Error('File upload failed: Request timeout'));
         });
         
-        // 配置S3上传请求
-        console.log(`准备上传文件到S3:
+        // Configure S3 upload request
+        console.log(`Preparing to upload file to S3:
           - URL: ${uploadUrl}
-          - 文件名: ${file.name}
-          - 文件大小: ${file.size} bytes
-          - 文件类型: ${file.type}
+          - Filename: ${file.name}
+          - File size: ${file.size} bytes
+          - File type: ${file.type}
           - S3 Key: ${s3Key}
           - File ID: ${fileId}`);
         
         xhr.open('PUT', uploadUrl);
         xhr.setRequestHeader('Content-Type', file.type);
-        xhr.timeout = 300000; // 5分钟超时
+        xhr.timeout = 300000; // 5 minutes timeout
         
-        console.log('开始发送文件到S3...');
-        // 直接发送文件内容
+        console.log('Starting file upload to S3...');
+        // Send file content directly
         xhr.send(file);
       });
 
     } catch (error: any) {
-      throw new Error(`文档上传失败: ${error.message || error}`);
+      throw new Error(`Document upload failed: ${error.message || error}`);
     }
   }
 

@@ -1,43 +1,43 @@
 #!/bin/bash
 set -e
 
-# 部署前端应用到 S3
-# 确保配置与 Terraform 保持一致
+# Deploy frontend application to S3
+# Ensure configuration is consistent with Terraform
 
-echo "🚀 开始部署前端应用..."
+echo "🚀 Starting frontend deployment..."
 
-# 检查必需的环境变量
+# Check required environment variables
 if [ -z "$S3_BUCKET" ]; then
-    echo "❌ 错误：未设置 S3_BUCKET 环境变量"
-    echo "请设置：export S3_BUCKET=your-bucket-name"
+    echo "❌ Error: S3_BUCKET environment variable not set"
+    echo "Please set: export S3_BUCKET=your-bucket-name"
     exit 1
 fi
 
-# 生成配置文件
-echo "📋 生成配置文件..."
+# Generate configuration file
+echo "📋 Generating configuration file..."
 npm run generate-config
 
-# 构建应用
-echo "🔨 构建应用..."
+# Build application
+echo "🔨 Building application..."
 npm run build
 
-# 上传到 S3
-echo "☁️  上传到 S3..."
+# Upload to S3
+echo "☁️  Uploading to S3..."
 aws s3 sync build/ s3://$S3_BUCKET/ --delete --exclude "config.json"
 
-# 注意：config.json 被排除，因为它由 Terraform 管理
-echo "⚠️  注意：config.json 由 Terraform 管理，未上传本地版本"
+# Note: config.json is excluded as it's managed by Terraform
+echo "⚠️  Note: config.json is managed by Terraform, local version not uploaded"
 
-# 使 CloudFront 缓存失效（如果设置了 CLOUDFRONT_DISTRIBUTION_ID）
+# Invalidate CloudFront cache (if CLOUDFRONT_DISTRIBUTION_ID is set)
 if [ -n "$CLOUDFRONT_DISTRIBUTION_ID" ]; then
-    echo "🔄 使 CloudFront 缓存失效..."
+    echo "🔄 Invalidating CloudFront cache..."
     aws cloudfront create-invalidation \
         --distribution-id $CLOUDFRONT_DISTRIBUTION_ID \
         --paths "/*"
 fi
 
-echo "✅ 部署完成！"
+echo "✅ Deployment complete!"
 echo ""
-echo "📝 提醒："
-echo "   - config.json 由 Terraform 管理"
-echo "   - 如需更新配置，请修改 Terraform 变量并运行 terraform apply"
+echo "📝 Reminder:"
+echo "   - config.json is managed by Terraform"
+echo "   - To update configuration, modify Terraform variables and run terraform apply"

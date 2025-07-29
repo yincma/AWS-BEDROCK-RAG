@@ -389,31 +389,21 @@ resource "aws_api_gateway_method_response" "http_methods" {
   }
 }
 
+
 # Integration Responses for all HTTP methods (to map CORS headers)
+# For AWS_PROXY integration, only one integration response per method is needed
 resource "aws_api_gateway_integration_response" "http_methods" {
-  for_each = var.enable_cors ? merge([
-    for method_key, method_config in local.http_methods : {
-      for status in local.status_codes : "${method_key}_${status}" => {
-        rest_api_id = aws_api_gateway_rest_api.main.id
-        resource_id = method_config.resource.id
-        http_method = method_config.method.http_method
-        status_code = status
-      }
-    }
-  ]...) : {}
+  for_each = var.enable_cors ? local.http_methods : {}
 
-  rest_api_id = each.value.rest_api_id
-  resource_id = each.value.resource_id
-  http_method = each.value.http_method
-  status_code = each.value.status_code
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = each.value.resource.id
+  http_method = each.value.method.http_method
+  
+  # For AWS_PROXY integration, match status code with method response
+  status_code = "200"
 
-  # Use selection pattern to match Lambda error responses
-  selection_pattern = each.value.status_code == "200" ? "" : (
-    each.value.status_code == "400" ? ".*[Bad Request|Invalid].*" :
-    each.value.status_code == "401" ? ".*[Unauthorized|Token].*" :
-    each.value.status_code == "403" ? ".*Forbidden.*" :
-    each.value.status_code == "500" ? ".*[Error|Exception].*" : ""
-  )
+  # No selection pattern needed for AWS_PROXY integration
+  # Lambda function returns the complete response including status code
 
   response_parameters = {
     "method.response.header.Access-Control-Allow-Origin"  = var.cors_allowed_origins[0] == "*" ? "'*'" : "'${join(",", var.cors_allowed_origins)}'"
@@ -421,7 +411,16 @@ resource "aws_api_gateway_integration_response" "http_methods" {
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'"
   }
 
-  depends_on = [aws_api_gateway_method_response.http_methods]
+  depends_on = [
+    aws_api_gateway_integration.query_post,
+    aws_api_gateway_integration.documents_post,
+    aws_api_gateway_integration.documents_get,
+    aws_api_gateway_integration.document_get,
+    aws_api_gateway_integration.document_delete,
+    aws_api_gateway_integration.index_post,
+    aws_api_gateway_integration.query_status_get,
+    aws_api_gateway_integration.upload_post
+  ]
 }
 
 # API Gateway Deployment

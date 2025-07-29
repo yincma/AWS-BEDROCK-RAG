@@ -11,7 +11,7 @@ const AuthTestPage: React.FC = () => {
   const checkAuthStatus = async () => {
     setLoading(true);
     try {
-      // 1. 检查当前用户
+      // 1. Check current user
       const user = await getCurrentUser();
       const session = await fetchAuthSession();
       
@@ -39,7 +39,7 @@ const AuthTestPage: React.FC = () => {
     setApiTestResult({ loading: true });
     
     try {
-      // 获取认证token
+      // Get auth token
       const session = await fetchAuthSession();
       const idToken = session.tokens?.idToken?.toString();
       

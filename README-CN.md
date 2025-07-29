@@ -836,22 +836,6 @@ MIT License
 **最后更新**: 2025-07-29  
 **状态**: 生产就绪
 
-## 🧹 AWS 资源管理
-
-### 统一清理脚本
-本项目提供了统一的AWS资源管理脚本 `aws-cleanup.sh`，支持资源检查和清理功能。
-
-```bash
-# 检查资源
-./aws-cleanup.sh check
-
-# 清理资源
-./aws-cleanup.sh clean
-
-# 先检查后清理（默认）
-./aws-cleanup.sh
-```
-
 ---
 
 ### 📝 文档版本历史

@@ -37,7 +37,7 @@ const ChatPage: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  // 检查认证状态
+  // Check authentication status
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -64,20 +64,20 @@ const ChatPage: React.FC = () => {
     
     if (!inputMessage.trim() || loading) return;
     
-    // 检查用户是否已登录
+    // Check if user is logged in
     try {
       const session = await authService.getAuthSession();
       if (!session || !session.tokens?.idToken) {
-        setError('请先登录后再使用问答功能');
+        setError('Please log in to use the Q&A feature');
         errorService.showWarningNotification(
-          '需要登录',
-          '请先登录您的账户才能使用智能问答功能'
+          'Login Required',
+          'Please log in to your account to use the Smart Q&A feature'
         );
         return;
       }
     } catch (error) {
       console.error('Failed to check auth status:', error);
-      setError('认证检查失败，请刷新页面后重试');
+      setError('Authentication check failed, please refresh the page and try again');
       return;
     }
 
@@ -120,7 +120,7 @@ const ChatPage: React.FC = () => {
         // Update the loading message with the actual response
         const finalBotMessage: ChatMessage = {
           ...loadingBotMessage,
-          content: answer || '抱歉，我无法为您的问题生成回答。',
+          content: answer || 'Sorry, I cannot generate an answer for your question.',
           sources: sources,
           isLoading: false
         };
@@ -134,26 +134,26 @@ const ChatPage: React.FC = () => {
         // Show appropriate notification
         if (no_documents) {
           errorService.showWarningNotification(
-            '知识库为空',
-            '请先上传文档后再进行查询'
+            'Knowledge Base Empty',
+            'Please upload documents before querying'
           );
         } else if (sources.length > 0) {
           errorService.showInfoNotification(
-            '找到相关文档',
-            `基于 ${sources.length} 个文档源生成回答`
+            'Found relevant documents',
+            `Answer generated based on ${sources.length} document sources`
           );
         }
       } else {
-        // 解析详细的错误信息
-        let errorMessage = '查询失败';
+        // Parse detailed error message
+        let errorMessage = 'Query failed';
         if (response.error?.message) {
           try {
-            // 尝试解析后端返回的详细错误信息
-            if (response.error.message.includes('内部服务器错误:') || response.error.message.includes('查询处理失败:')) {
+            // Try to parse detailed error message from backend
+            if (response.error.message.includes('Internal server error:') || response.error.message.includes('Query processing failed:')) {
               const jsonPart = response.error.message.replace(/^[^:]+:\s*/, '');
               const errorDetails = JSON.parse(jsonPart);
               if (errorDetails.environment?.KNOWLEDGE_BASE_ID === 'NOT_SET' || errorDetails.environment?.KNOWLEDGE_BASE_ID === '') {
-                errorMessage = 'Knowledge Base未配置。请运行 ./scripts/get-knowledge-base-info.sh 获取配置信息。';
+                errorMessage = 'Knowledge Base not configured. Please run ./scripts/get-knowledge-base-info.sh for configuration info.';
               } else if (errorDetails.error) {
                 errorMessage = errorDetails.error;
               }
@@ -173,17 +173,17 @@ const ChatPage: React.FC = () => {
         prev.filter(msg => msg.id !== loadingBotMessage.id)
       );
 
-      // 根据错误类型提供更具体的用户提示
-      let userMessage = '处理您的问题时出现错误，请重试';
+      // Provide more specific user messages based on error type
+      let userMessage = 'An error occurred while processing your question, please try again';
       
       if (error.status === 502 || error.status === 503) {
-        userMessage = '智能问答服务暂时不可用，请确保后端服务已正确部署';
+        userMessage = 'Smart Q&A service is temporarily unavailable, please ensure backend services are properly deployed';
       } else if (error.status === 401) {
-        userMessage = '您的登录已过期，请重新登录';
+        userMessage = 'Your login has expired, please log in again';
       } else if (error.status === 403) {
-        userMessage = '您没有使用此功能的权限';
+        userMessage = 'You do not have permission to use this feature';
       } else if (error.status === 404) {
-        userMessage = 'API服务未找到，请检查后端配置';
+        userMessage = 'API service not found, please check backend configuration';
       } else if (error.status === 500) {
         // 检查是否是Knowledge Base配置问题
         if (error.message && (
@@ -191,9 +191,9 @@ const ChatPage: React.FC = () => {
           error.message.includes('KNOWLEDGE_BASE_ID') ||
           error.message.includes('NOT_SET')
         )) {
-          userMessage = 'Knowledge Base未正确配置。请联系管理员检查AWS资源部署。';
+          userMessage = 'Knowledge Base not properly configured. Please contact administrator to check AWS resource deployment.';
         } else {
-          userMessage = '服务器处理请求时出错，请稍后重试';
+          userMessage = 'Server error processing request, please try again later';
         }
       } else if (error.message) {
         userMessage = error.message;
@@ -208,7 +208,7 @@ const ChatPage: React.FC = () => {
         }
       );
 
-      setError(errorMessage.user_message || '发生未知错误');
+      setError(errorMessage.user_message || 'An unknown error occurred');
     } finally {
       setLoading(false);
     }
@@ -268,7 +268,7 @@ const ChatPage: React.FC = () => {
             {message.isLoading ? (
               <Box display="flex" alignItems="center" gap={2}>
                 <CircularProgress size={20} />
-                <Typography variant="body1" sx={{ fontWeight: 500 }}>正在思考中...</Typography>
+                <Typography variant="body1" sx={{ fontWeight: 500 }}>Thinking...</Typography>
               </Box>
             ) : (
               <>
@@ -390,10 +390,10 @@ const ChatPage: React.FC = () => {
         textAlign: 'center'
       }}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
-          💬 智能问答
+          💬 Smart Q&A
         </Typography>
         <Typography variant="body1" sx={{ opacity: 0.9 }}>
-          基于知识库的AI智能问答助手
+          AI-powered Q&A assistant based on knowledge base
         </Typography>
       </Box>
       
@@ -408,7 +408,7 @@ const ChatPage: React.FC = () => {
         {!isAuthenticated && (
           <Alert severity="warning" sx={{ m: 2 }}>
             <Typography variant="body2">
-              您需要登录才能使用智能问答功能。请先登录您的账户。
+              You need to log in to use the Smart Q&A feature. Please log in to your account.
             </Typography>
           </Alert>
         )}
@@ -435,23 +435,23 @@ const ChatPage: React.FC = () => {
               }}>
                 <BotIcon sx={{ fontSize: 80, mb: 2, opacity: 0.7, color: 'primary.main' }} />
                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, color: 'text.primary' }}>
-                  🧠 企业RAG知识助手
+                  🧠 Enterprise RAG Knowledge Assistant
                 </Typography>
                 <Typography variant="body1" textAlign="center" sx={{ mb: 3, color: 'text.secondary' }}>
-                  我是您的AI知识助手，可以基于您的文档库回答任何问题。请输入您的问题，我会为您搜索相关信息并提供准确的答案。
+                  I'm your AI knowledge assistant. I can answer any questions based on your document library. Please enter your question and I'll search for relevant information to provide accurate answers.
                 </Typography>
                 
                 <Box sx={{ mt: 4 }}>
                   <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600, color: 'text.primary' }}>
-                    💡 试试这些问题：
+                    💡 Try these questions:
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
                     {[
-                      "公司的远程工作政策是什么？",
-                      "如何提交费用报销？",
-                      "项目管理流程有哪些？",
-                      "AWS Bedrock 有什么特点？",
-                      "Lambda 函数的最佳实践？"
+                      "What is the company's remote work policy?",
+                      "How do I submit expense reimbursements?",
+                      "What are the project management processes?",
+                      "What are the features of AWS Bedrock?",
+                      "What are the best practices for Lambda functions?"
                     ].map((suggestion, index) => (
                       <Chip
                         key={index}
@@ -494,7 +494,7 @@ const ChatPage: React.FC = () => {
                 fullWidth
                 multiline
                 maxRows={4}
-                placeholder={isAuthenticated ? "问我关于您文档库的任何问题..." : "请先登录后再使用问答功能"}
+                placeholder={isAuthenticated ? "Ask me anything about your document library..." : "Please log in to use the Q&A feature"}
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 disabled={loading || !isAuthenticated}
@@ -559,7 +559,7 @@ const ChatPage: React.FC = () => {
                     }
                   }}
                 >
-                  🗑️ 清空对话历史
+                  🗑️ Clear conversation history
                 </Button>
               )}
             </Box>

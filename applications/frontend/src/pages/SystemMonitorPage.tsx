@@ -103,42 +103,42 @@ const SystemMonitorPage: React.FC = () => {
         {
           name: 'API Gateway',
           status: 'healthy',
-          description: 'AWS API Gateway 运行正常',
+          description: 'AWS API Gateway running normally',
           response_time: 45,
           last_check: new Date().toISOString()
         },
         {
           name: 'Lambda Functions',
           status: 'healthy',
-          description: '查询处理函数运行正常',
+          description: 'Query handler function running normally',
           response_time: 230,
           last_check: new Date().toISOString()
         },
         {
           name: 'Amazon Bedrock',
           status: 'healthy',
-          description: 'Amazon Nova 模型服务正常',
+          description: 'Amazon Nova model service normal',
           response_time: 850,
           last_check: new Date().toISOString()
         },
         {
           name: 'Document Store',
           status: 'healthy',
-          description: 'S3 文档存储正常',
+          description: 'S3 document storage normal',
           response_time: 35,
           last_check: new Date().toISOString()
         },
         {
           name: 'Vector Database',
           status: 'warning',
-          description: 'OpenSearch 负载较高',
+          description: 'OpenSearch load is high',
           response_time: 450,
           last_check: new Date().toISOString()
         },
         {
           name: 'Authentication',
           status: 'healthy',
-          description: 'Cognito 用户认证正常',
+          description: 'Cognito user authentication normal',
           response_time: 120,
           last_check: new Date().toISOString()
         }
@@ -174,7 +174,7 @@ const SystemMonitorPage: React.FC = () => {
         fetchPerformanceData()
       ]);
     } catch (error: any) {
-      setError('刷新监控数据失败: ' + error.message);
+      setError('Failed to refresh monitoring data: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -226,10 +226,10 @@ const SystemMonitorPage: React.FC = () => {
         textAlign: 'center'
       }}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
-          📈 系统监控
+          📈 System Monitoring
         </Typography>
         <Typography variant="body1" sx={{ opacity: 0.9 }}>
-          实时监控系统性能和组件状态
+          Real-time monitoring of system performance and component status
         </Typography>
       </Box>
 
@@ -247,7 +247,7 @@ const SystemMonitorPage: React.FC = () => {
           onClick={refreshAllData}
           disabled={loading}
         >
-          刷新数据
+          Refresh Data
         </Button>
       </Box>
 
@@ -258,7 +258,7 @@ const SystemMonitorPage: React.FC = () => {
             <CardContent>
               <Box display="flex" alignItems="center" mb={3}>
                 <ComputerIcon color="primary" sx={{ mr: 2 }} />
-                <Typography variant="h6">💻 系统资源</Typography>
+                <Typography variant="h6">💻 System Resources</Typography>
               </Box>
               
               {systemMetrics ? (
@@ -266,7 +266,7 @@ const SystemMonitorPage: React.FC = () => {
                   {/* CPU */}
                   <Box mb={3}>
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                      <Typography variant="body2" color="text.secondary">CPU 使用率</Typography>
+                      <Typography variant="body2" color="text.secondary">CPU Usage</Typography>
                       <Typography variant="body2" fontWeight={500}>
                         {systemMetrics.cpu_percent.toFixed(1)}%
                       </Typography>
@@ -282,9 +282,9 @@ const SystemMonitorPage: React.FC = () => {
                   {/* Memory */}
                   <Box mb={3}>
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                      <Typography variant="body2" color="text.secondary">内存使用率</Typography>
+                      <Typography variant="body2" color="text.secondary">Memory Usage</Typography>
                       <Typography variant="body2" fontWeight={500}>
-                        {systemMetrics.memory_percent.toFixed(1)}% (可用: {systemMetrics.memory_available.toFixed(1)} GB)
+                        {systemMetrics.memory_percent.toFixed(1)}% (Available: {systemMetrics.memory_available.toFixed(1)} GB)
                       </Typography>
                     </Box>
                     <LinearProgress 
@@ -298,9 +298,9 @@ const SystemMonitorPage: React.FC = () => {
                   {/* Disk */}
                   <Box>
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                      <Typography variant="body2" color="text.secondary">磁盘使用率</Typography>
+                      <Typography variant="body2" color="text.secondary">Disk Usage</Typography>
                       <Typography variant="body2" fontWeight={500}>
-                        {systemMetrics.disk_usage.percent.toFixed(1)}% (可用: {formatBytes(systemMetrics.disk_usage.free * 1024 * 1024 * 1024)})
+                        {systemMetrics.disk_usage.percent.toFixed(1)}% (Available: {formatBytes(systemMetrics.disk_usage.free * 1024 * 1024 * 1024)})
                       </Typography>
                     </Box>
                     <LinearProgress 
@@ -326,7 +326,7 @@ const SystemMonitorPage: React.FC = () => {
             <CardContent>
               <Box display="flex" alignItems="center" mb={3}>
                 <ApiIcon color="primary" sx={{ mr: 2 }} />
-                <Typography variant="h6">🔧 组件状态</Typography>
+                <Typography variant="h6">🔧 Component Status</Typography>
               </Box>
               
               <List dense>
@@ -343,8 +343,8 @@ const SystemMonitorPage: React.FC = () => {
                           </Typography>
                           <Chip
                             size="small"
-                            label={component.status === 'healthy' ? '正常' : 
-                                   component.status === 'warning' ? '警告' : '异常'}
+                            label={component.status === 'healthy' ? 'Normal' : 
+                                   component.status === 'warning' ? 'Warning' : 'Error'}
                             color={getStatusColor(component.status) as any}
                             variant="outlined"
                           />
@@ -357,7 +357,7 @@ const SystemMonitorPage: React.FC = () => {
                           </Typography>
                           {component.response_time && (
                             <Typography variant="caption" color="text.secondary" display="block">
-                              响应时间: {component.response_time}ms
+                              Response time: {component.response_time}ms
                             </Typography>
                           )}
                         </Box>
@@ -375,23 +375,23 @@ const SystemMonitorPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                📊 性能趋势（24小时）
+                📊 Performance Trends (24 hours)
               </Typography>
               
               <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle2" gutterBottom>响应时间 (ms)</Typography>
+                  <Typography variant="subtitle2" gutterBottom>Response Time (ms)</Typography>
                   <ResponsiveContainer width="100%" height={200}>
                     <AreaChart data={performanceData}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis 
                         dataKey="timestamp" 
-                        tickFormatter={(value) => new Date(value).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                        tickFormatter={(value) => new Date(value).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                       />
                       <YAxis />
                       <Tooltip 
-                        labelFormatter={(value) => new Date(value).toLocaleString('zh-CN')}
-                        formatter={(value: number) => [`${value.toFixed(0)}ms`, '响应时间']}
+                        labelFormatter={(value) => new Date(value).toLocaleString('en-US')}
+                        formatter={(value: number) => [`${value.toFixed(0)}ms`, 'Response Time']}
                       />
                       <Area type="monotone" dataKey="response_time" stroke="#667eea" fill="#667eea" fillOpacity={0.3} />
                     </AreaChart>
@@ -399,18 +399,18 @@ const SystemMonitorPage: React.FC = () => {
                 </Grid>
                 
                 <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle2" gutterBottom>吞吐量 (请求/分钟)</Typography>
+                  <Typography variant="subtitle2" gutterBottom>Throughput (requests/minute)</Typography>
                   <ResponsiveContainer width="100%" height={200}>
                     <LineChart data={performanceData}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis 
                         dataKey="timestamp" 
-                        tickFormatter={(value) => new Date(value).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                        tickFormatter={(value) => new Date(value).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                       />
                       <YAxis />
                       <Tooltip 
-                        labelFormatter={(value) => new Date(value).toLocaleString('zh-CN')}
-                        formatter={(value: number) => [`${value.toFixed(1)}`, '请求/分钟']}
+                        labelFormatter={(value) => new Date(value).toLocaleString('en-US')}
+                        formatter={(value: number) => [`${value.toFixed(1)}`, 'requests/minute']}
                       />
                       <Line type="monotone" dataKey="throughput" stroke="#764ba2" strokeWidth={2} />
                     </LineChart>
@@ -427,28 +427,28 @@ const SystemMonitorPage: React.FC = () => {
             <CardContent>
               <Box display="flex" alignItems="center" mb={3}>
                 <PsychologyIcon color="primary" sx={{ mr: 2 }} />
-                <Typography variant="h6">⚙️ 系统配置</Typography>
+                <Typography variant="h6">⚙️ System Configuration</Typography>
               </Box>
               
               <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle2" gutterBottom>模型配置</Typography>
+                  <Typography variant="subtitle2" gutterBottom>Model Configuration</Typography>
                   <Table size="small">
                     <TableBody>
                       <TableRow>
-                        <TableCell>LLM 模型</TableCell>
+                        <TableCell>LLM Model</TableCell>
                         <TableCell>Amazon Nova Pro</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell>嵌入模型</TableCell>
+                        <TableCell>Embedding Model</TableCell>
                         <TableCell>Amazon Titan Embeddings</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell>向量数据库</TableCell>
+                        <TableCell>Vector Database</TableCell>
                         <TableCell>Amazon OpenSearch</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell>文档存储</TableCell>
+                        <TableCell>Document Storage</TableCell>
                         <TableCell>Amazon S3</TableCell>
                       </TableRow>
                     </TableBody>
@@ -456,23 +456,23 @@ const SystemMonitorPage: React.FC = () => {
                 </Grid>
                 
                 <Grid item xs={12} md={6}>
-                  <Typography variant="subtitle2" gutterBottom>运行时配置</Typography>
+                  <Typography variant="subtitle2" gutterBottom>Runtime Configuration</Typography>
                   <Table size="small">
                     <TableBody>
                       <TableRow>
-                        <TableCell>AWS 区域</TableCell>
+                        <TableCell>AWS Region</TableCell>
                         <TableCell>us-east-1</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell>Lambda 内存</TableCell>
+                        <TableCell>Lambda Memory</TableCell>
                         <TableCell>1024 MB</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell>超时时间</TableCell>
+                        <TableCell>Timeout</TableCell>
                         <TableCell>30s</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell>并发限制</TableCell>
+                        <TableCell>Concurrency Limit</TableCell>
                         <TableCell>100</TableCell>
                       </TableRow>
                     </TableBody>

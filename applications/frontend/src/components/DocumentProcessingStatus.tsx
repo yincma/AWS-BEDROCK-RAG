@@ -83,10 +83,10 @@ const DocumentProcessingStatus: React.FC<ProcessingStatusProps> = ({
           onStatusChange(response.data.systemReady);
         }
       } else {
-        throw new Error(response.error?.message || '获取状态失败');
+        throw new Error(response.error?.message || 'Failed to get status');
       }
     } catch (err: any) {
-      setError(err.message || '无法获取处理状态');
+      setError(err.message || 'Unable to get processing status');
       console.error('Failed to fetch status:', err);
     } finally {
       setLoading(false);
@@ -144,7 +144,7 @@ const DocumentProcessingStatus: React.FC<ProcessingStatusProps> = ({
         <CardContent>
           <Box display="flex" alignItems="center" justifyContent="center" py={2}>
             <CircularProgress size={24} sx={{ mr: 2 }} />
-            <Typography>加载处理状态...</Typography>
+            <Typography>Loading processing status...</Typography>
           </Box>
         </CardContent>
       </Card>
@@ -156,7 +156,7 @@ const DocumentProcessingStatus: React.FC<ProcessingStatusProps> = ({
       <Alert severity="error" sx={{ mb: 3 }}>
         {error}
         <Button onClick={fetchStatus} size="small" sx={{ ml: 2 }}>
-          重试
+          Retry
         </Button>
       </Alert>
     );
@@ -170,7 +170,7 @@ const DocumentProcessingStatus: React.FC<ProcessingStatusProps> = ({
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
           <Box display="flex" alignItems="center">
             <Typography variant="h6" component="div">
-              文档处理状态
+              Document Processing Status
             </Typography>
             {refreshing && <CircularProgress size={20} sx={{ ml: 2 }} />}
           </Box>
@@ -200,7 +200,7 @@ const DocumentProcessingStatus: React.FC<ProcessingStatusProps> = ({
           <Box sx={{ mb: 2 }}>
             <LinearProgress variant="indeterminate" />
             <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-              正在处理文档，请稍候...
+              Processing documents, please wait...
             </Typography>
           </Box>
         )}
@@ -213,11 +213,11 @@ const DocumentProcessingStatus: React.FC<ProcessingStatusProps> = ({
             size="small"
           />
           <Chip 
-            label={`已处理文档: ${status.summary.documentsProcessed}`}
+            label={`Documents Processed: ${status.summary.documentsProcessed}`}
             size="small"
           />
           <Chip 
-            label={`总任务数: ${status.summary.totalJobs}`}
+            label={`Total Jobs: ${status.summary.totalJobs}`}
             size="small"
           />
         </Box>
@@ -227,7 +227,7 @@ const DocumentProcessingStatus: React.FC<ProcessingStatusProps> = ({
           <Divider sx={{ my: 2 }} />
           
           <Typography variant="subtitle2" gutterBottom>
-            最近的处理任务
+            Recent Processing Jobs
           </Typography>
           
           <List dense>
@@ -238,7 +238,7 @@ const DocumentProcessingStatus: React.FC<ProcessingStatusProps> = ({
                     <Box display="flex" alignItems="center" gap={1}>
                       {getStatusIcon(job.status)}
                       <Typography variant="body2">
-                        任务 {job.id.slice(-8)}
+                        Job {job.id.slice(-8)}
                       </Typography>
                       <Chip 
                         label={job.status} 
@@ -249,10 +249,10 @@ const DocumentProcessingStatus: React.FC<ProcessingStatusProps> = ({
                   }
                   secondary={
                     <Typography variant="caption" color="text.secondary">
-                      扫描: {job.documentsScanned} | 
-                      索引: {job.documentsIndexed} | 
-                      失败: {job.documentsFailed} | 
-                      开始时间: {new Date(job.startedAt).toLocaleTimeString()}
+                      Scanned: {job.documentsScanned} | 
+                      Indexed: {job.documentsIndexed} | 
+                      Failed: {job.documentsFailed} | 
+                      Started: {new Date(job.startedAt).toLocaleTimeString()}
                     </Typography>
                   }
                 />
@@ -262,7 +262,7 @@ const DocumentProcessingStatus: React.FC<ProcessingStatusProps> = ({
 
           {status.ingestionJobs.length === 0 && (
             <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
-              暂无处理任务记录
+              No processing job history
             </Typography>
           )}
         </Collapse>

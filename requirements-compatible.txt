@@ -1,37 +1,37 @@
-# AWS Bedrock RAG System - 兼容性依赖文件
-# 解决依赖冲突的统一版本配置
+# AWS Bedrock RAG System - Compatibility Dependencies File
+# Unified version configuration to resolve dependency conflicts
 
-# 核心AWS依赖 - 使用兼容版本
+# Core AWS dependencies - using compatible versions
 boto3==1.34.0
 botocore==1.34.0
 awscli==1.32.0
 
-# 网络库 - 使用兼容版本
+# Network libraries - using compatible versions
 urllib3==1.26.18
 requests==2.31.0
 certifi>=2022.12.7
 
-# OpenSearch - 使用2.4.0版本以兼容Lambda和其他依赖
+# OpenSearch - using version 2.4.0 for Lambda and other dependency compatibility
 opensearch-py==2.4.0
 requests-aws4auth==1.2.3
 
-# 其他AWS服务
+# Other AWS services
 s3transfer==0.10.0
 jmespath==1.0.1
 
-# Python工具库
+# Python utility libraries
 python-dateutil==2.8.2
 six==1.16.0
 PyYAML==6.0.1
 
-# 开发和测试工具（可选）
+# Development and testing tools (optional)
 pytest==7.4.3
 pytest-cov==4.1.0
 black==23.11.0
 flake8==6.1.0
 mypy==1.7.1
 
-# Jupyter支持（如需要）
+# Jupyter support (if needed)
 jupyterlab==4.0.9
 notebook==7.0.6
 ipykernel==6.27.1

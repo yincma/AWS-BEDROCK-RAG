@@ -52,7 +52,7 @@ const DocumentsPage: React.FC = () => {
       setLoading(true);
       let lastError: any = null;
       
-      // 重试逻辑
+      // Retry logic
       for (let attempt = 0; attempt < retries; attempt++) {
         try {
           console.log(`[DocumentsPage] Attempt ${attempt + 1}/${retries} - Calling apiService.getDocuments()`);
@@ -312,10 +312,10 @@ const DocumentsPage: React.FC = () => {
         textAlign: 'center'
       }}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
-          📚 文档管理
+          📚 Document Management
         </Typography>
         <Typography variant="body1" sx={{ opacity: 0.9 }}>
-          上传和管理您的知识库文档
+          Upload and manage your knowledge base documents
         </Typography>
       </Box>
 
@@ -330,10 +330,10 @@ const DocumentsPage: React.FC = () => {
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
           <Box>
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, color: 'text.primary' }}>
-              📄 文档库管理
+              📄 Document Library Management
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              上传、查看和管理您的知识库文档
+              Upload, view and manage your knowledge base documents
             </Typography>
           </Box>
           <Box display="flex" gap={2}>
@@ -353,7 +353,7 @@ const DocumentsPage: React.FC = () => {
                 }
               }}
             >
-              🔄 刷新
+              🔄 Refresh
             </Button>
             <Button
               variant="contained"
@@ -367,7 +367,7 @@ const DocumentsPage: React.FC = () => {
                 }
               }}
             >
-              📁 上传文档
+              📁 Upload Document
             </Button>
           </Box>
         </Box>
@@ -383,7 +383,7 @@ const DocumentsPage: React.FC = () => {
         {uploads.length > 0 && (
           <Box mb={4}>
             <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: 'text.primary' }}>
-              ⏳ 正在上传的文档
+              ⏳ Uploading Documents
             </Typography>
             <Paper elevation={1} sx={{ p: 2, borderRadius: 2, bgcolor: '#f8f9fa' }}>
               <List>
@@ -416,7 +416,7 @@ const DocumentsPage: React.FC = () => {
                               <>
                                 <CircularProgress size={16} />
                                 <Typography variant="body2" color="primary" fontWeight={500}>
-                                  上传中...
+                                  Uploading...
                                 </Typography>
                               </>
                             )}
@@ -424,7 +424,7 @@ const DocumentsPage: React.FC = () => {
                               <>
                                 <SuccessIcon color="success" fontSize="small" />
                                 <Typography variant="body2" color="success.main" fontWeight={500}>
-                                  上传完成
+                                  Upload Complete
                                 </Typography>
                               </>
                             )}
@@ -432,7 +432,7 @@ const DocumentsPage: React.FC = () => {
                               <>
                                 <ErrorIcon color="error" fontSize="small" />
                                 <Typography variant="body2" color="error.main" fontWeight={500}>
-                                  上传失败
+                                  Upload Failed
                                 </Typography>
                               </>
                             )}
@@ -461,7 +461,7 @@ const DocumentsPage: React.FC = () => {
 
         <Box>
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: 'text.primary' }}>
-            📊 知识库文档 ({documents.length})
+            📊 Knowledge Base Documents ({documents.length})
           </Typography>
           
           {documents.length === 0 ? (
@@ -479,10 +479,10 @@ const DocumentsPage: React.FC = () => {
             >
               <DocumentIcon sx={{ fontSize: 80, mb: 3, opacity: 0.6, color: 'primary.main' }} />
               <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, color: 'text.primary' }}>
-                📚 暂无文档
+                📚 No Documents Yet
               </Typography>
               <Typography variant="body1" textAlign="center" sx={{ maxWidth: 500, mb: 4, color: 'text.secondary' }}>
-                您的知识库还是空的。上传您的第一个文档，开始构建智能知识问答系统。
+                Your knowledge base is empty. Upload your first document to start building your intelligent Q&A system.
               </Typography>
               <Button
                 variant="contained"
@@ -500,7 +500,7 @@ const DocumentsPage: React.FC = () => {
                   }
                 }}
               >
-                📁 上传第一个文档
+                📁 Upload First Document
               </Button>
             </Box>
           ) : (
@@ -528,8 +528,8 @@ const DocumentsPage: React.FC = () => {
                           </Typography>
                           <Chip 
                             size="small" 
-                            label={document.status === 'active' ? '✅ 活跃' : 
-                                   document.status === 'processing' ? '⚙️ 处理中' : '❌ 错误'} 
+                            label={document.status === 'active' ? '✅ Active' : 
+                                   document.status === 'processing' ? '⚙️ Processing' : '❌ Error'} 
                             color={getStatusColor(document.status) as any}
                             variant="filled"
                             sx={{ fontWeight: 500 }}
@@ -539,14 +539,14 @@ const DocumentsPage: React.FC = () => {
                       secondary={
                         <Box>
                           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                            📏 {formatFileSize(document.size)} • 📅 上传于 {new Date(document.upload_date).toLocaleDateString('zh-CN')}
+                            📏 {formatFileSize(document.size)} • 📅 Uploaded on {new Date(document.upload_date).toLocaleDateString('en-US')}
                           </Typography>
                           {document.metadata && (
                             <Box display="flex" gap={1} flexWrap="wrap">
                               {document.metadata?.pages && (
                                 <Chip 
                                   size="small" 
-                                  label={`📄 ${document.metadata.pages} 页`} 
+                                  label={`📄 ${document.metadata.pages} pages`} 
                                   variant="outlined" 
                                   color="info"
                                 />
@@ -554,7 +554,7 @@ const DocumentsPage: React.FC = () => {
                               {document.metadata?.words && (
                                 <Chip 
                                   size="small" 
-                                  label={`📝 ${document.metadata.words} 字`} 
+                                  label={`📝 ${document.metadata.words} words`} 
                                   variant="outlined" 
                                   color="info"
                                 />
@@ -593,7 +593,7 @@ const DocumentsPage: React.FC = () => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>上传文档</DialogTitle>
+        <DialogTitle>Upload Document</DialogTitle>
         <DialogContent>
           <Box
             {...getRootProps()}
@@ -622,7 +622,7 @@ const DocumentsPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setUploadDialogOpen(false)}>取消</Button>
+          <Button onClick={() => setUploadDialogOpen(false)}>Cancel</Button>
         </DialogActions>
       </Dialog>
 

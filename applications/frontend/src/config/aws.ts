@@ -1,13 +1,13 @@
 // ================================
-// AWS配置文件
+// AWS Configuration File
 // Enterprise RAG System Frontend AWS Configuration
 // ================================
 
 import { AWSConfig } from '@/types';
 
-// 从环境变量或构建时注入的配置中获取AWS设置
+// Get AWS settings from environment variables or build-time injected configuration
 const getAWSConfig = (): AWSConfig => {
-  // 调试信息：打印所有环境变量
+  // Debug info: print all environment variables
   console.log('Environment variables:', {
     REACT_APP_AWS_REGION: process.env.REACT_APP_AWS_REGION,
     REACT_APP_USER_POOL_ID: process.env.REACT_APP_USER_POOL_ID,
@@ -16,7 +16,7 @@ const getAWSConfig = (): AWSConfig => {
     NODE_ENV: process.env.NODE_ENV,
   });
   
-  // 这些值将在构建时由Terraform注入
+  // These values will be injected by Terraform at build time
   const config: AWSConfig = {
     region: process.env.REACT_APP_AWS_REGION || 'us-east-1',
     userPoolId: process.env.REACT_APP_USER_POOL_ID || '',
@@ -25,14 +25,14 @@ const getAWSConfig = (): AWSConfig => {
     identityPoolId: process.env.REACT_APP_IDENTITY_POOL_ID || undefined,
   };
 
-  // 验证必需的配置
+  // Validate required configuration
   const requiredFields = ['userPoolId', 'userPoolWebClientId', 'apiGatewayUrl'];
   const missingFields = requiredFields.filter(field => !config[field as keyof AWSConfig]);
   
   if (missingFields.length > 0) {
     console.warn('Missing AWS configuration fields:', missingFields);
     
-    // 在开发环境中提供默认值
+    // Provide default values in development environment
     if (process.env.NODE_ENV === 'development') {
       console.warn('Using development defaults for missing AWS config');
       return {
@@ -49,7 +49,7 @@ const getAWSConfig = (): AWSConfig => {
 
 export const awsConfig = getAWSConfig();
 
-// Amplify配置 (v6格式)
+// Amplify configuration (v6 format)
 export const amplifyConfig = {
   Auth: {
     Cognito: {
@@ -84,10 +84,10 @@ export const amplifyConfig = {
   },
 };
 
-// API配置
+// API configuration
 export const apiConfig = {
   baseURL: awsConfig.apiGatewayUrl,
-  timeout: 30000, // 30秒超时
+  timeout: 30000, // 30 seconds timeout
   retries: 3,
   endpoints: {
     query: '/query',
@@ -100,7 +100,7 @@ export const apiConfig = {
   },
 };
 
-// 应用配置
+// Application configuration
 export const appConfig = {
   name: 'Enterprise RAG',
   version: process.env.REACT_APP_VERSION || '1.0.0',
@@ -108,7 +108,7 @@ export const appConfig = {
   enableAnalytics: process.env.REACT_APP_ENABLE_ANALYTICS === 'true',
   enableDebug: process.env.NODE_ENV === 'development',
   
-  // 功能开关
+  // Feature toggles
   features: {
     chat: true,
     documentUpload: true,
@@ -118,7 +118,7 @@ export const appConfig = {
     multiLanguage: true,
   },
   
-  // 默认设置
+  // Default settings
   defaults: {
     theme: 'light' as const,
     language: 'auto' as const,
@@ -128,7 +128,7 @@ export const appConfig = {
     notifications: true,
   },
   
-  // 限制和约束
+  // Limits and constraints
   limits: {
     maxFileSize: 100 * 1024 * 1024, // 100MB
     maxQueryLength: 1000,
@@ -144,7 +144,7 @@ export const appConfig = {
     maxConcurrentUploads: 3,
   },
   
-  // 用户界面配置
+  // User interface configuration
   ui: {
     sidebarWidth: 280,
     headerHeight: 64,
@@ -153,7 +153,7 @@ export const appConfig = {
     debounceDelay: 500,
   },
   
-  // 错误重试配置
+  // Error retry configuration
   retry: {
     maxAttempts: 3,
     baseDelay: 1000,
@@ -161,18 +161,18 @@ export const appConfig = {
     backoffFactor: 2,
   },
   
-  // 缓存配置
+  // Cache configuration
   cache: {
     enabled: true,
-    ttl: 5 * 60 * 1000, // 5分钟
+    ttl: 5 * 60 * 1000, // 5 minutes
     maxEntries: 100,
   },
 };
 
-// 导出配置验证函数
+// Export configuration validation function
 export const validateConfig = (): boolean => {
   try {
-    // 检查AWS配置
+    // Check AWS configuration
     if (!awsConfig.userPoolId || !awsConfig.userPoolWebClientId) {
       console.error('AWS Cognito configuration is missing');
       return false;
@@ -183,7 +183,7 @@ export const validateConfig = (): boolean => {
       return false;
     }
     
-    // 检查URL格式
+    // Check URL format
     try {
       new URL(awsConfig.apiGatewayUrl);
     } catch {
@@ -198,7 +198,7 @@ export const validateConfig = (): boolean => {
   }
 };
 
-// 开发环境配置检查
+// Development environment configuration check
 if (process.env.NODE_ENV === 'development') {
   console.log('AWS Configuration:', {
     region: awsConfig.region,

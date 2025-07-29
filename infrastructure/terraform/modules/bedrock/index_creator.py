@@ -49,11 +49,9 @@ def handler(event, context):
                 },
                 "text": {
                     "type": "text"
-                },
-                "metadata": {
-                    "type": "object",
-                    "enabled": True
                 }
+                # metadata字段不预定义，让Bedrock在首次索引时动态创建
+                # 这避免了"object mapping tried to parse field as object, but found a concrete value"错误
             }
         }
     }

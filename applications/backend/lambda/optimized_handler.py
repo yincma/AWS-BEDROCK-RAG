@@ -1,6 +1,6 @@
 """
-优化的Lambda处理器基类
-实现冷启动优化、连接池复用、缓存等性能优化措施
+Optimized Lambda handler base class
+Implements cold start optimization, connection pool reuse, caching and other performance optimization measures
 """
 import json
 import logging
@@ -11,14 +11,14 @@ from typing import Dict, Any, Optional, Callable
 import boto3
 from botocore.config import Config
 
-# 配置日志（在Lambda容器外初始化）
+# Configure logging (initialize outside Lambda container)
 logger = logging.getLogger()
 logger.setLevel(os.getenv('LOG_LEVEL', 'INFO'))
 
-# 全局客户端缓存（减少冷启动时间）
+# Global client cache (reduce cold start time)
 _clients_cache = {}
 
-# AWS客户端配置
+# AWS client configuration
 AWS_CONFIG = Config(
     region_name=os.getenv('AWS_REGION', 'us-east-1'),
     retries={
@@ -30,8 +30,8 @@ AWS_CONFIG = Config(
 
 def get_aws_client(service_name: str, **kwargs):
     """
-    获取或创建AWS客户端（单例模式）
-    使用连接池复用连接，减少延迟
+    Get or create AWS client (singleton pattern)
+    Use connection pool to reuse connections and reduce latency
     """
     cache_key = f"{service_name}:{json.dumps(kwargs, sort_keys=True)}"
     
@@ -39,39 +39,39 @@ def get_aws_client(service_name: str, **kwargs):
         client_kwargs = {'config': AWS_CONFIG}
         client_kwargs.update(kwargs)
         _clients_cache[cache_key] = boto3.client(service_name, **client_kwargs)
-        logger.info(f"创建新的AWS客户端: {service_name}")
+        logger.info(f"Creating new AWS client: {service_name}")
     
     return _clients_cache[cache_key]
 
-# 预加载常用客户端（在Lambda容器启动时执行）
+# Preload common clients (execute when Lambda container starts)
 def preload_clients():
-    """预加载常用AWS客户端，减少首次请求延迟"""
+    """Preload common AWS clients to reduce first request latency"""
     services = ['bedrock-runtime', 'bedrock-agent-runtime', 's3', 'cloudwatch']
     for service in services:
         try:
             get_aws_client(service)
         except Exception as e:
-            logger.warning(f"预加载客户端失败 {service}: {e}")
+            logger.warning(f"Failed to preload client {service}: {e}")
 
-# Lambda容器启动时执行
+# Execute when Lambda container starts
 preload_clients()
 
 class LambdaOptimizedHandler:
-    """优化的Lambda处理器基类"""
+    """Optimized Lambda handler base class"""
     
     def __init__(self):
-        # 初始化时获取所需的客户端
+        # Get required clients during initialization
         self.bedrock_runtime = get_aws_client('bedrock-runtime')
         self.bedrock_agent = get_aws_client('bedrock-agent-runtime')
         self.s3 = get_aws_client('s3')
         self.cloudwatch = get_aws_client('cloudwatch')
         
-        # 配置缓存
+        # Configure cache
         self._config_cache = {}
         self._load_config()
     
     def _load_config(self):
-        """加载并缓存配置"""
+        """Load and cache configuration"""
         self._config_cache = {
             'knowledge_base_id': os.getenv('KNOWLEDGE_BASE_ID'),
             'data_source_id': os.getenv('DATA_SOURCE_ID'),
@@ -83,21 +83,21 @@ class LambdaOptimizedHandler:
     @lru_cache(maxsize=1024)
     def get_cached_response(self, cache_key: str) -> Optional[Dict[str, Any]]:
         """
-        内存缓存响应（适用于频繁查询）
-        注意：Lambda内存有限，谨慎使用
+        Memory cache response (suitable for frequent queries)
+        Note: Lambda memory is limited, use with caution
         """
-        # 这是一个占位符，实际实现需要考虑缓存失效策略
+        # This is a placeholder, actual implementation needs to consider cache invalidation strategy
         return None
     
     def set_cached_response(self, cache_key: str, response: Dict[str, Any], ttl: int = 300):
-        """设置缓存响应"""
-        # 实际实现中可以使用ElastiCache或DynamoDB进行分布式缓存
+        """Set cache response"""
+        # In actual implementation, you can use ElastiCache or DynamoDB for distributed caching
         pass
 
 def performance_monitor(metric_name: str = None):
     """
-    性能监控装饰器
-    自动记录函数执行时间并发送CloudWatch指标
+    Performance monitoring decorator
+    Automatically records function execution time and sends CloudWatch metrics
     """
     def decorator(func: Callable) -> Callable:
         @wraps(func)
@@ -106,9 +106,9 @@ def performance_monitor(metric_name: str = None):
             
             try:
                 result = func(*args, **kwargs)
-                execution_time = (time.time() - start_time) * 1000  # 转换为毫秒
+                execution_time = (time.time() - start_time) * 1000  # Convert to milliseconds
                 
-                # 发送性能指标
+                # Send performance metrics
                 try:
                     cloudwatch = get_aws_client('cloudwatch')
                     cloudwatch.put_metric_data(
@@ -132,17 +132,17 @@ def performance_monitor(metric_name: str = None):
                         ]
                     )
                 except Exception as e:
-                    logger.warning(f"发送性能指标失败: {e}")
+                    logger.warning(f"Failed to send performance metrics: {e}")
                 
-                # 记录慢查询
-                if execution_time > 3000:  # 3秒
-                    logger.warning(f"慢查询检测: {func.__name__} 耗时 {execution_time:.2f}ms")
+                # Log slow queries
+                if execution_time > 3000:  # 3 seconds
+                    logger.warning(f"Slow query detected: {func.__name__} took {execution_time:.2f}ms")
                 
                 return result
                 
             except Exception as e:
                 execution_time = (time.time() - start_time) * 1000
-                logger.error(f"函数执行失败: {func.__name__}, 耗时 {execution_time:.2f}ms", exc_info=True)
+                logger.error(f"Function execution failed: {func.__name__}, took {execution_time:.2f}ms", exc_info=True)
                 raise
         
         return wrapper
@@ -150,23 +150,23 @@ def performance_monitor(metric_name: str = None):
 
 def batch_processor(batch_size: int = 25):
     """
-    批处理装饰器
-    将多个请求合并处理，提高吞吐量
+    Batch processing decorator
+    Merge multiple requests for processing to improve throughput
     """
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(items: list, *args, **kwargs):
             results = []
             
-            # 分批处理
+            # Process in batches
             for i in range(0, len(items), batch_size):
                 batch = items[i:i + batch_size]
                 try:
                     batch_results = func(batch, *args, **kwargs)
                     results.extend(batch_results)
                 except Exception as e:
-                    logger.error(f"批处理失败 (批次 {i//batch_size + 1}): {e}")
-                    # 继续处理其他批次
+                    logger.error(f"Batch processing failed (batch {i//batch_size + 1}): {e}")
+                    # Continue processing other batches
                     results.extend([None] * len(batch))
             
             return results
@@ -176,8 +176,8 @@ def batch_processor(batch_size: int = 25):
 
 class ConnectionPool:
     """
-    连接池管理器
-    用于管理外部服务连接（如OpenSearch）
+    Connection pool manager
+    Used to manage external service connections (e.g., OpenSearch)
     """
     def __init__(self, max_connections: int = 10):
         self.max_connections = max_connections
@@ -185,7 +185,7 @@ class ConnectionPool:
         self._available = []
     
     def get_connection(self):
-        """获取可用连接"""
+        """Get available connection"""
         if self._available:
             return self._available.pop()
         elif len(self._connections) < self.max_connections:
@@ -193,34 +193,34 @@ class ConnectionPool:
             self._connections.append(conn)
             return conn
         else:
-            # 等待可用连接
-            raise RuntimeError("连接池已满")
+            # Wait for available connection
+            raise RuntimeError("Connection pool is full")
     
     def release_connection(self, conn):
-        """释放连接回池"""
+        """Release connection back to pool"""
         if conn in self._connections:
             self._available.append(conn)
     
     def _create_connection(self):
-        """创建新连接（子类实现）"""
+        """Create new connection (subclass implementation)"""
         raise NotImplementedError
 
-# 预热处理器
+# Warmup handler
 def warmup_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     """
-    Lambda预热处理器
-    处理CloudWatch Events的预热请求
+    Lambda warmup handler
+    Handle CloudWatch Events warmup requests
     """
-    # 检查是否是预热请求
+    # Check if it's a warmup request
     if event.get('source') == 'aws.events' and event.get('detail-type') == 'Scheduled Event':
-        logger.info("收到Lambda预热请求")
+        logger.info("Received Lambda warmup request")
         
-        # 执行预热操作
+        # Execute warmup operations
         try:
-            # 预加载客户端
+            # Preload clients
             preload_clients()
             
-            # 预热其他资源（如加载模型配置）
+            # Warm up other resources (e.g., load model configuration)
             from applications.backend.shared.config import Config
             Config.load()
             
@@ -232,7 +232,7 @@ def warmup_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 })
             }
         except Exception as e:
-            logger.error(f"预热失败: {e}")
+            logger.error(f"Warmup failed: {e}")
             return {
                 'statusCode': 500,
                 'body': json.dumps({
@@ -241,14 +241,14 @@ def warmup_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 })
             }
     
-    # 不是预热请求，返回None让主处理器处理
+    # Not a warmup request, return None to let main handler process
     return None
 
-# 智能重试装饰器
+# Smart retry decorator
 def smart_retry(max_attempts: int = 3, backoff_factor: float = 2.0):
     """
-    智能重试装饰器
-    针对特定错误类型进行指数退避重试
+    Smart retry decorator
+    Exponential backoff retry for specific error types
     """
     def decorator(func: Callable) -> Callable:
         @wraps(func)
@@ -261,27 +261,27 @@ def smart_retry(max_attempts: int = 3, backoff_factor: float = 2.0):
                 except Exception as e:
                     last_exception = e
                     
-                    # 判断是否应该重试
+                    # Determine if should retry
                     if should_retry(e):
                         if attempt < max_attempts - 1:
                             wait_time = backoff_factor ** attempt
-                            logger.warning(f"重试 {func.__name__} (尝试 {attempt + 1}/{max_attempts}), 等待 {wait_time}秒")
+                            logger.warning(f"Retrying {func.__name__} (attempt {attempt + 1}/{max_attempts}), waiting {wait_time} seconds")
                             time.sleep(wait_time)
                         else:
-                            logger.error(f"重试失败: {func.__name__} 已达最大尝试次数")
+                            logger.error(f"Retry failed: {func.__name__} reached maximum attempts")
                     else:
-                        # 不应重试的错误，直接抛出
+                        # Non-retryable error, raise directly
                         raise
             
-            # 所有重试都失败
+            # All retries failed
             raise last_exception
         
         return wrapper
     return decorator
 
 def should_retry(exception: Exception) -> bool:
-    """判断错误是否应该重试"""
-    # 可重试的错误类型
+    """Determine if error should be retried"""
+    # Retryable error types
     retryable_errors = [
         'ThrottlingException',
         'RequestLimitExceeded',
@@ -293,37 +293,37 @@ def should_retry(exception: Exception) -> bool:
     error_message = str(exception)
     return any(error in error_message for error in retryable_errors)
 
-# 导出优化的查询处理器
+# Export optimized query handler
 class OptimizedQueryHandler(LambdaOptimizedHandler):
-    """优化的查询处理器"""
+    """Optimized query handler"""
     
     @performance_monitor(metric_name="query_processing_time")
     @smart_retry(max_attempts=3)
     def process_query(self, question: str, top_k: int = 5) -> Dict[str, Any]:
         """
-        处理查询请求
-        包含缓存、性能监控和重试机制
+        Process query request
+        Includes caching, performance monitoring and retry mechanism
         """
-        # 生成缓存键
+        # Generate cache key
         cache_key = f"query:{question}:{top_k}"
         
-        # 检查缓存
+        # Check cache
         cached_response = self.get_cached_response(cache_key)
         if cached_response:
-            logger.info("从缓存返回结果")
+            logger.info("Returning result from cache")
             return cached_response
         
-        # 执行实际查询
+        # Execute actual query
         response = self._execute_query(question, top_k)
         
-        # 缓存结果
+        # Cache result
         self.set_cached_response(cache_key, response)
         
         return response
     
     def _execute_query(self, question: str, top_k: int) -> Dict[str, Any]:
-        """执行实际的查询逻辑"""
-        # 这里是实际的查询实现
+        """Execute actual query logic"""
+        # This is the actual query implementation
         knowledge_base_id = self._config_cache['knowledge_base_id']
         model_id = self._config_cache['model_id']
         

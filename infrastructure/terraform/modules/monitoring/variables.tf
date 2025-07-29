@@ -1,74 +1,87 @@
-# 监控模块变量定义
+# Monitoring module variable definitions
 
 variable "project_name" {
-  description = "项目名称"
+  description = "Project name"
   type        = string
 }
 
 variable "environment" {
-  description = "环境名称"
+  description = "Environment name"
   type        = string
 }
 
 variable "aws_region" {
-  description = "AWS区域"
+  description = "AWS region"
   type        = string
   default     = "us-east-1"
 }
 
 variable "common_tags" {
-  description = "通用标签"
+  description = "Common tags"
   type        = map(string)
   default     = {}
 }
 
 variable "alarm_email" {
-  description = "告警通知邮箱"
+  description = "Alert notification email"
   type        = string
   default     = ""
 }
 
 variable "api_gateway_name" {
-  description = "API Gateway名称"
+  description = "API Gateway name"
   type        = string
 }
 
 variable "api_gateway_stage" {
-  description = "API Gateway阶段"
+  description = "API Gateway stage"
   type        = string
 }
 
 variable "lambda_functions" {
-  description = "要监控的Lambda函数列表"
+  description = "List of Lambda functions to monitor"
   type        = list(string)
 }
 
 variable "cost_alert_threshold" {
-  description = "成本告警阈值（USD）"
+  description = "Cost alert threshold (USD)"
   type        = number
   default     = 500
 }
 
 variable "enable_xray_tracing" {
-  description = "是否启用X-Ray追踪"
+  description = "Enable X-Ray tracing"
   type        = bool
   default     = true
 }
 
 variable "enable_synthetics" {
-  description = "是否启用Synthetics监控"
+  description = "Enable Synthetics monitoring"
   type        = bool
   default     = false
 }
 
 variable "monitoring_bucket" {
-  description = "监控数据存储桶"
+  description = "Monitoring data storage bucket"
   type        = string
   default     = ""
 }
 
 variable "api_endpoint" {
-  description = "API端点URL（用于Synthetics）"
+  description = "API endpoint URL (for Synthetics)"
+  type        = string
+  default     = ""
+}
+
+# Knowledge Base monitoring
+variable "enable_kb_sync_monitoring" {
+  description = "Enable Knowledge Base sync monitoring"
+  type        = bool
+  default     = true
+}
+
+variable "knowledge_base_id" {
+  description = "Knowledge Base ID"
   type        = string
   default     = ""
 }
