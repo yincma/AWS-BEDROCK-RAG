@@ -1,0 +1,92 @@
+# 项目配置文件
+project:
+  name: enterprise-rag
+  version: 2.0.0
+  description: 基于AWS Nova的企业级RAG知识问答系统
+
+structure:
+  applications:
+    backend:
+      - lambda: Lambda函数代码
+      - layers: Lambda层
+      - shared: 共享代码库
+    frontend:
+      - React TypeScript应用
+  
+  infrastructure:
+    terraform:
+      modules:
+        - networking: 网络模块（VPC、子网、安全组）
+        - compute: 计算模块（Lambda、API Gateway）
+        - storage: 存储模块（S3、OpenSearch）
+        - security: 安全模块（WAF、Cognito、IAM）
+        - monitoring: 监控模块（CloudWatch、X-Ray）
+      environments:
+        - dev: 开发环境配置
+        - staging: 预发布环境配置
+        - prod: 生产环境配置
+  
+  scripts:
+    deploy: 部署脚本
+    test: 测试脚本
+    utils: 工具脚本
+  
+  config:
+    environments: 环境配置文件
+    secrets: 密钥配置模板
+  
+  tests:
+    unit: 单元测试
+    integration: 集成测试
+    e2e: 端到端测试
+
+dependencies:
+  python: ">=3.9"
+  node: ">=16"
+  terraform: ">=1.0"
+  aws-cli: ">=2.0"
+
+standards:
+  python:
+    formatter: black
+    linter: flake8
+    type_checker: mypy
+  
+  javascript:
+    formatter: prettier
+    linter: eslint
+    framework: react
+  
+  terraform:
+    version: "~> 1.5"
+    formatter: terraform fmt
+
+ci_cd:
+  provider: github_actions
+  environments:
+    - dev
+    - staging
+    - prod
+  
+  stages:
+    - security_scan
+    - lint
+    - test
+    - build
+    - deploy
+
+monitoring:
+  cloudwatch:
+    namespace: enterprise-rag
+    retention_days:
+      dev: 7
+      staging: 14
+      prod: 30
+  
+  alarms:
+    error_threshold: 5
+    latency_threshold: 3000
+    cost_threshold:
+      dev: 500
+      staging: 1000
+      prod: 2000

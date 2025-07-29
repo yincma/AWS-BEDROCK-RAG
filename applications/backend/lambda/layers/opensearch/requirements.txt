@@ -1,0 +1,10 @@
+# OpenSearch 和 AWS 依赖
+opensearch-py==2.4.0
+boto3==1.26.165
+botocore==1.29.165
+urllib3>=1.26.0,<2.0
+requests>=2.25.0
+requests-aws4auth>=1.1.1
+certifi>=2021.5.30
+python-dateutil>=2.8.2
+six>=1.16.0

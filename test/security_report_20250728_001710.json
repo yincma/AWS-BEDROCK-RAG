@@ -1,0 +1,139 @@
+{
+  "timestamp": "2025-07-28T00:17:10.393085",
+  "summary": {
+    "total_tests": 14,
+    "passed": 5,
+    "warnings": 5,
+    "info": 4,
+    "vulnerabilities": {
+      "total": 5,
+      "by_severity": {
+        "HIGH": 0,
+        "MEDIUM": 3,
+        "LOW": 2
+      }
+    }
+  },
+  "test_results": [
+    {
+      "test": "SQL Injection Prevention",
+      "status": "INFO",
+      "details": "Code uses AWS SDK which parameterizes queries automatically",
+      "timestamp": "2025-07-28T00:17:10.393059"
+    },
+    {
+      "test": "XSS Prevention",
+      "status": "INFO",
+      "details": "Handler strips input with .strip() and uses JSON encoding",
+      "timestamp": "2025-07-28T00:17:10.393066"
+    },
+    {
+      "test": "Command Injection Prevention",
+      "status": "PASS",
+      "details": "No system command execution found in handler code",
+      "timestamp": "2025-07-28T00:17:10.393067"
+    },
+    {
+      "test": "Authentication Headers",
+      "status": "INFO",
+      "details": "CORS headers allow Authorization header",
+      "timestamp": "2025-07-28T00:17:10.393069"
+    },
+    {
+      "test": "Token Validation",
+      "status": "WARNING",
+      "details": "No explicit token validation found in handler - relies on API Gateway",
+      "timestamp": "2025-07-28T00:17:10.393070"
+    },
+    {
+      "test": "Input Length Validation",
+      "status": "WARNING",
+      "details": "No explicit length limit found for question parameter",
+      "timestamp": "2025-07-28T00:17:10.393071"
+    },
+    {
+      "test": "Numeric Parameter Validation",
+      "status": "INFO",
+      "details": "top_k parameter has default value of 5",
+      "timestamp": "2025-07-28T00:17:10.393072"
+    },
+    {
+      "test": "File Operation Security",
+      "status": "PASS",
+      "details": "No direct file operations found in handler",
+      "timestamp": "2025-07-28T00:17:10.393073"
+    },
+    {
+      "test": "Error Information Disclosure",
+      "status": "WARNING",
+      "details": "Error responses include detailed environment information in some cases",
+      "timestamp": "2025-07-28T00:17:10.393074"
+    },
+    {
+      "test": "Exception Handling",
+      "status": "PASS",
+      "details": "All functions have try-except blocks",
+      "timestamp": "2025-07-28T00:17:10.393075"
+    },
+    {
+      "test": "CORS Origin Policy",
+      "status": "WARNING",
+      "details": "Access-Control-Allow-Origin set to '*' (wildcard)",
+      "timestamp": "2025-07-28T00:17:10.393076"
+    },
+    {
+      "test": "CORS Methods",
+      "status": "PASS",
+      "details": "Only allows GET, POST, OPTIONS methods",
+      "timestamp": "2025-07-28T00:17:10.393077"
+    },
+    {
+      "test": "Secrets Management",
+      "status": "PASS",
+      "details": "Uses environment variables for configuration",
+      "timestamp": "2025-07-28T00:17:10.393079"
+    },
+    {
+      "test": "Logging Security",
+      "status": "WARNING",
+      "details": "Full request body is logged, may contain sensitive data",
+      "timestamp": "2025-07-28T00:17:10.393079"
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "severity": "MEDIUM",
+      "description": "Authentication validation delegated to API Gateway",
+      "recommendation": "Ensure API Gateway has proper authorizer configured"
+    },
+    {
+      "severity": "LOW",
+      "description": "No input length validation for questions",
+      "recommendation": "Add maximum length check (e.g., 1000 characters) to prevent DoS"
+    },
+    {
+      "severity": "LOW",
+      "description": "Detailed error messages may leak environment information",
+      "recommendation": "Sanitize error messages in production environment"
+    },
+    {
+      "severity": "MEDIUM",
+      "description": "CORS allows any origin with wildcard '*'",
+      "recommendation": "Restrict CORS to specific allowed domains in production"
+    },
+    {
+      "severity": "MEDIUM",
+      "description": "Request body logged without sanitization",
+      "recommendation": "Implement log sanitization to remove sensitive fields"
+    }
+  ],
+  "recommendations": [
+    "1. Implement input length validation for all user inputs",
+    "2. Restrict CORS to specific domains instead of wildcard",
+    "3. Sanitize error messages to prevent information disclosure",
+    "4. Implement request/response logging sanitization",
+    "5. Add rate limiting at API Gateway level",
+    "6. Implement proper authentication token validation",
+    "7. Consider implementing request signing for additional security"
+  ]
+}

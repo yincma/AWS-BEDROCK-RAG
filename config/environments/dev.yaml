@@ -1,0 +1,53 @@
+# 开发环境配置
+environment: dev
+region: us-east-1
+
+api:
+  endpoint: https://api.dev.enterprise-rag.com
+  timeout: 30000
+  stage: dev
+
+cognito:
+  user_pool_id: ${COGNITO_USER_POOL_ID}
+  client_id: ${COGNITO_CLIENT_ID}
+  domain: ${COGNITO_DOMAIN}
+
+bedrock:
+  model_id: amazon.nova-pro-v1:0
+  embedding_model_id: amazon.titan-embed-text-v1
+  knowledge_base_id: ${KNOWLEDGE_BASE_ID}
+  data_source_id: ${DATA_SOURCE_ID}
+  max_tokens: 1000
+  temperature: 0.1
+
+s3:
+  document_bucket: ${DOCUMENT_BUCKET_NAME}
+  frontend_bucket: ${FRONTEND_BUCKET_NAME}
+
+features:
+  enable_waf: false
+  enable_xray: true
+  enable_shield: false
+  log_level: DEBUG
+  log_retention_days: 7
+
+monitoring:
+  cloudwatch_namespace: enterprise-rag/dev
+  alarm_email: ${ALARM_EMAIL}
+
+vpc:
+  cidr: 10.0.0.0/16
+  public_subnets:
+    - 10.0.1.0/24
+    - 10.0.2.0/24
+  private_subnets:
+    - 10.0.10.0/24
+    - 10.0.20.0/24
+  availability_zones:
+    - us-east-1a
+    - us-east-1b
+
+lambda:
+  memory_size: 1024
+  timeout: 300
+  reserved_concurrent_executions: 5

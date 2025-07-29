@@ -1,0 +1,7 @@
+{
+  "apiEndpoint": "https://vjywvai0e7.execute-api.us-east-1.amazonaws.com/dev",
+  "region": "us-east-1",
+  "environment": "development",
+  "userPoolId": "us-east-1_eWwwtNJ75",
+  "userPoolClientId": "5ge6g7a8fd44ipk39r9nl7mbu1"
+}

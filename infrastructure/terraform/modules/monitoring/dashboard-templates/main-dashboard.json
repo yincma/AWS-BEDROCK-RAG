@@ -1,0 +1,108 @@
+{
+  "widgets": [
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 3,
+      "properties": {
+        "metrics": [
+          [ "RAG-System/Health", "SystemAvailability", { "stat": "Average", "label": "系统可用性 %" } ],
+          [ "AWS/ApiGateway", "Count", { "stat": "Sum", "label": "API请求总数" } ],
+          [ ".", "4XXError", { "stat": "Sum", "label": "客户端错误", "color": "#ff7f0e" } ],
+          [ ".", "5XXError", { "stat": "Sum", "label": "服务器错误", "color": "#d62728" } ]
+        ],
+        "view": "singleValue",
+        "stacked": false,
+        "region": "${aws_region}",
+        "title": "系统概览",
+        "period": 300
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 3,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "AWS/Lambda", "Invocations", { "stat": "Sum" } ],
+          [ ".", "Errors", { "stat": "Sum", "color": "#d62728" } ],
+          [ ".", "Duration", { "stat": "Average", "yAxis": "right" } ],
+          [ ".", "ConcurrentExecutions", { "stat": "Maximum", "yAxis": "right" } ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "${aws_region}",
+        "title": "Lambda函数性能汇总",
+        "period": 300,
+        "yAxis": {
+          "left": { "label": "调用次数", "min": 0 },
+          "right": { "label": "执行时间(ms) / 并发数", "min": 0 }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 3,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "RAG-System/QueryHandler", "BedrockRequests", { "stat": "Sum", "label": "Bedrock请求" } ],
+          [ ".", "BedrockLatency", { "stat": "Average", "label": "Bedrock延迟" } ],
+          [ ".", "TokensUsed", { "stat": "Sum", "label": "Token使用量", "yAxis": "right" } ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "${aws_region}",
+        "title": "AI服务使用情况",
+        "period": 300,
+        "yAxis": {
+          "left": { "label": "请求数 / 延迟(ms)", "min": 0 },
+          "right": { "label": "Token数", "min": 0 }
+        }
+      }
+    },
+    {
+      "type": "metric", 
+      "x": 0,
+      "y": 9,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "RAG-System/Analytics", "QueryComplexity", { "stat": "Average", "label": "查询复杂度" } ],
+          [ ".", "ResponseRelevance", { "stat": "Average", "label": "响应相关性" } ],
+          [ ".", "UserSatisfaction", { "stat": "Average", "label": "用户满意度", "yAxis": "right" } ],
+          [ "RAG-System/Performance", "ColdStartRate", { "stat": "Average", "label": "冷启动率%", "yAxis": "right" } ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "${aws_region}",
+        "title": "质量与性能指标",
+        "period": 3600,
+        "yAxis": {
+          "left": { "label": "评分 (0-100)", "min": 0, "max": 100 },
+          "right": { "label": "满意度 / 冷启动率", "min": 0, "max": 5 }
+        }
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 15,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE '/aws/lambda/${project_name}-query-handler-${environment}' | SOURCE '/aws/lambda/${project_name}-document-processor-${environment}' | fields @timestamp, @message, @logStream | filter @message like /ERROR/ | sort @timestamp desc | limit 50",
+        "region": "${aws_region}",
+        "title": "最近错误日志",
+        "queryType": "Logs"
+      }
+    }
+  ]
+}

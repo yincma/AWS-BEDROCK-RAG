@@ -1,0 +1,328 @@
+# OPA Policy Enforcement Configuration
+# Controls how policies are enforced across different environments
+
+apiVersion: v1
+kind: PolicyEnforcementConfig
+metadata:
+  name: aws-rag-policy-enforcement
+  version: "1.0.0"
+  description: "Policy enforcement configuration for AWS RAG system"
+  created: "2025-07-26"
+
+# Global enforcement settings
+global:
+  # Default enforcement level if not specified per environment
+  default_enforcement_level: "strict"
+  
+  # Enable/disable enforcement globally
+  enforcement_enabled: true
+  
+  # Enable/disable specific policy categories globally
+  policy_categories:
+    security: true
+    cost: true
+    compliance: true
+    performance: true
+  
+  # Global exemption settings
+  exemptions:
+    # Allow emergency deployments to bypass policies
+    emergency_bypass_enabled: true
+    emergency_bypass_duration_hours: 24
+    emergency_bypass_approval_required: true
+    
+    # Temporary exemption settings
+    temporary_exemptions_enabled: true
+    max_exemption_duration_days: 30
+    exemption_approval_required: true
+
+# Environment-specific enforcement settings
+environments:
+  # Development environment
+  dev:
+    enforcement_level: "warn"  # More lenient for development
+    
+    # Policy categories enabled in dev
+    policy_categories:
+      security: true
+      cost: false      # Cost policies disabled in dev
+      compliance: true
+      performance: false  # Performance policies disabled in dev
+    
+    # Dev-specific thresholds
+    thresholds:
+      max_violations_allowed: 5
+      max_warnings_allowed: 10
+      cost_threshold_usd: 100  # Lower cost threshold for dev
+    
+    # Exemption settings for dev
+    exemptions:
+      auto_approve_minor_violations: true
+      temporary_exemptions_enabled: true
+      max_exemption_duration_days: 7  # Shorter duration for dev
+    
+    # Notification settings
+    notifications:
+      on_violations: false
+      on_warnings: false
+      on_policy_updates: true
+      recipients:
+        - "dev-team@company.com"
+
+  # Staging environment
+  staging:
+    enforcement_level: "strict"
+    
+    # All policy categories enabled in staging
+    policy_categories:
+      security: true
+      cost: true
+      compliance: true
+      performance: true
+    
+    # Staging-specific thresholds
+    thresholds:
+      max_violations_allowed: 2
+      max_warnings_allowed: 5
+      cost_threshold_usd: 500
+    
+    # Exemption settings for staging
+    exemptions:
+      auto_approve_minor_violations: false
+      temporary_exemptions_enabled: true
+      max_exemption_duration_days: 14
+      approval_required: true
+    
+    # Notification settings
+    notifications:
+      on_violations: true
+      on_warnings: true
+      on_policy_updates: true
+      recipients:
+        - "staging-team@company.com"
+        - "security-team@company.com"
+
+  # Production environment
+  prod:
+    enforcement_level: "strict"
+    
+    # All policy categories strictly enforced in production
+    policy_categories:
+      security: true
+      cost: true
+      compliance: true
+      performance: true
+    
+    # Production-specific thresholds (strictest)
+    thresholds:
+      max_violations_allowed: 0  # Zero tolerance in production
+      max_warnings_allowed: 2
+      cost_threshold_usd: 1000
+    
+    # Exemption settings for production
+    exemptions:
+      auto_approve_minor_violations: false
+      temporary_exemptions_enabled: true
+      max_exemption_duration_days: 7  # Shortest duration for prod
+      approval_required: true
+      require_multiple_approvers: true
+      min_approvers: 2
+    
+    # Notification settings
+    notifications:
+      on_violations: true
+      on_warnings: true
+      on_policy_updates: true
+      on_enforcement_actions: true
+      recipients:
+        - "prod-team@company.com"
+        - "security-team@company.com"
+        - "compliance-team@company.com"
+        - "ops-team@company.com"
+
+# Policy-specific enforcement settings
+policies:
+  # Security policy enforcement
+  security:
+    # Critical security policies that always block deployment
+    critical_policies:
+      - "encryption_at_rest"
+      - "encryption_in_transit"
+      - "public_access_prevention"
+      - "iam_policy_restrictions"
+    
+    # Security policies that generate warnings
+    warning_policies:
+      - "security_group_restrictions"
+      - "vpc_flow_logs"
+      - "cloudtrail_logging"
+    
+    # Exemption criteria for security policies
+    exemption_criteria:
+      - reason: "legacy_system_compatibility"
+        max_duration_days: 90
+        requires_security_review: true
+      - reason: "third_party_integration"
+        max_duration_days: 30
+        requires_security_review: true
+
+  # Cost policy enforcement
+  cost:
+    # Cost policies that block deployment
+    blocking_policies:
+      - "budget_exceeded"
+      - "instance_type_restrictions"
+      - "storage_class_optimization"
+    
+    # Cost policies that generate warnings
+    warning_policies:
+      - "unused_resources"
+      - "underutilized_resources"
+      - "cost_optimization_opportunities"
+    
+    # Cost thresholds by environment
+    cost_thresholds:
+      dev: 100
+      staging: 500
+      prod: 1000
+    
+    # Auto-remediation settings
+    auto_remediation:
+      enabled: true
+      actions:
+        - "terminate_unused_instances"
+        - "optimize_storage_classes"
+        - "adjust_instance_sizes"
+
+  # Compliance policy enforcement
+  compliance:
+    # Critical compliance policies
+    critical_policies:
+      - "required_tags"
+      - "data_classification"
+      - "backup_requirements"
+      - "audit_logging"
+    
+    # Compliance frameworks
+    frameworks:
+      - name: "SOC2"
+        enabled: true
+        policies:
+          - "access_control"
+          - "encryption"
+          - "logging"
+      - name: "GDPR"
+        enabled: true
+        policies:
+          - "data_protection"
+          - "privacy_controls"
+
+  # Performance policy enforcement
+  performance:
+    # Performance policies (typically warnings/recommendations)
+    recommendation_policies:
+      - "lambda_memory_optimization"
+      - "api_gateway_caching"
+      - "cloudfront_optimization"
+      - "database_performance"
+    
+    # Performance thresholds
+    thresholds:
+      lambda_cold_start_ms: 1000
+      api_response_time_ms: 500
+      cache_hit_ratio_percent: 80
+
+# Reporting and monitoring settings
+reporting:
+  # Report generation settings
+  generate_reports: true
+  report_formats:
+    - "json"
+    - "html"
+    - "pdf"
+  
+  # Report storage settings
+  storage:
+    local_path: "./reports"
+    s3_bucket: "aws-rag-policy-reports"
+    retention_days: 90
+  
+  # Dashboard settings
+  dashboard:
+    enabled: true
+    auto_refresh_minutes: 5
+    public_access: false
+    authentication_required: true
+
+# Integration settings
+integrations:
+  # GitHub integration
+  github:
+    enabled: true
+    webhook_url: "https://api.github.com/repos/org/aws-rag/hooks"
+    pr_comments: true
+    status_checks: true
+    block_merge_on_violations: true
+  
+  # Slack integration
+  slack:
+    enabled: true
+    webhook_url: "https://hooks.slack.com/services/xxx/yyy/zzz"
+    channels:
+      violations: "#security-alerts"
+      warnings: "#dev-notifications"
+      reports: "#compliance-reports"
+  
+  # Email integration
+  email:
+    enabled: true
+    smtp_server: "smtp.company.com"
+    from_address: "opa-policies@company.com"
+    templates:
+      violation: "violation-notification.html"
+      warning: "warning-notification.html"
+      report: "daily-report.html"
+
+# Advanced settings
+advanced:
+  # Policy evaluation settings
+  evaluation:
+    timeout_seconds: 300
+    parallel_evaluation: true
+    max_parallel_jobs: 4
+    retry_attempts: 3
+    
+  # Caching settings
+  caching:
+    enabled: true
+    policy_cache_ttl_minutes: 60
+    plan_cache_ttl_minutes: 30
+    
+  # Logging settings
+  logging:
+    level: "info"  # debug, info, warn, error
+    format: "json"
+    output: "file"
+    file_path: "./logs/policy-enforcement.log"
+    max_file_size_mb: 100
+    max_backup_files: 10
+
+# Metadata and versioning
+metadata:
+  config_version: "1.0.0"
+  last_updated: "2025-07-26T00:00:00Z"
+  author: "AWS RAG Policy Team"
+  description: |
+    This configuration file controls how OPA policies are enforced
+    across different environments in the AWS RAG system. It provides
+    granular control over enforcement levels, thresholds, exemptions,
+    and notifications.
+  
+  change_log:
+    - version: "1.0.0"
+      date: "2025-07-26"
+      changes:
+        - "Initial configuration setup"
+        - "Environment-specific enforcement levels"
+        - "Policy category configuration"
+        - "Exemption and notification settings"

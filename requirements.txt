@@ -1,0 +1,111 @@
+# 基于AWS Nova的企业级RAG知识问答系统依赖
+# AWS云原生RAG解决方案
+
+# AWS SDK和服务
+boto3>=1.34.0                  # AWS Python SDK
+botocore>=1.34.0               # AWS服务核心库
+# awscli>=2.15.0                 # AWS CLI 2.x should be installed separately
+
+# AWS Bedrock和AI服务
+langchain-aws>=0.1.0           # LangChain AWS集成
+langchain-community>=0.0.10    # LangChain社区组件
+
+# Web框架和API
+fastapi>=0.104.0               # 现代Web框架
+uvicorn>=0.24.0                # ASGI服务器
+pydantic>=2.5.0                # 数据验证
+starlette>=0.27.0              # Web框架核心
+
+# Lambda函数依赖
+lambda-decorators>=0.6.0       # Lambda装饰器
+python-lambda-local>=0.1.13    # 本地Lambda测试
+zappa>=0.58.0                  # Lambda部署工具
+
+# 文档处理
+PyPDF2>=3.0.1                  # PDF处理
+python-docx>=1.1.0             # Word文档处理
+python-multipart>=0.0.6        # 文件上传支持
+aiofiles>=23.2.1               # 异步文件处理
+
+# 数据处理和工具
+pandas>=2.1.0                  # 数据处理
+numpy>=1.24.0                  # 数值计算
+requests>=2.31.0               # HTTP请求
+aiohttp>=3.9.0                 # 异步HTTP客户端
+
+# 配置管理
+python-dotenv>=1.0.0           # 环境变量
+pydantic-settings>=2.1.0       # 设置管理
+PyYAML>=6.0.1                  # YAML配置
+
+# 监控和日志
+structlog>=23.2.0              # 结构化日志
+loguru>=0.7.2                  # 高级日志库
+prometheus-client>=0.19.0      # Prometheus指标
+
+# 安全和认证
+cryptography>=41.0.0           # 加密库
+jose>=1.0.0                    # JWT处理
+python-jose[cryptography]>=3.3.0  # JWT工具
+
+# 测试框架
+pytest>=7.4.0                  # 测试框架
+pytest-asyncio>=0.21.0         # 异步测试
+pytest-cov>=4.1.0              # 测试覆盖率
+moto>=4.2.0                    # AWS服务模拟
+httpx>=0.25.0                  # 异步HTTP测试客户端
+
+# 开发工具
+black>=23.9.0                  # 代码格式化
+isort>=5.12.0                  # 导入排序
+flake8>=6.1.0                  # 代码检查
+mypy>=1.6.0                    # 类型检查
+pre-commit>=3.5.0              # Git钩子
+
+# 基础设施即代码
+python-terraform>=0.10.1       # Terraform Python集成
+
+# 性能优化
+uvloop>=0.19.0                 # 高性能事件循环（Unix系统）
+orjson>=3.9.0                  # 快速JSON序列化
+
+# API文档
+fastapi-utils>=0.2.1           # FastAPI工具
+python-multipart>=0.0.6        # 表单数据支持
+
+# AWS特定工具
+awswrangler>=3.5.0             # AWS数据工程
+s3fs>=2023.12.0               # S3文件系统接口
+
+# 异步支持
+asyncio-mqtt>=0.16.0           # 异步MQTT（如需要）
+aioredis>=2.0.0               # 异步Redis（缓存）
+
+# 数据科学（可选）
+scikit-learn>=1.3.0           # 机器学习
+matplotlib>=3.8.0             # 数据可视化
+seaborn>=0.13.0               # 统计可视化
+
+# 部署和容器化
+docker>=6.1.0                 # Docker Python客户端
+kubernetes>=28.1.0            # Kubernetes客户端（如需要）
+
+# 工具库
+click>=8.1.0                  # 命令行工具
+rich>=13.7.0                  # 富文本终端输出
+tqdm>=4.66.0                  # 进度条
+
+# 类型注解
+typing-extensions>=4.8.0       # 类型注解扩展
+
+# 缓存
+redis>=5.0.0                  # Redis客户端
+aiocache>=0.12.0              # 异步缓存
+
+# 时间处理
+python-dateutil>=2.8.2        # 日期工具
+pytz>=2023.3                  # 时区处理
+
+# 并发和异步
+concurrent-futures>=3.1.1     # 并发工具（Python < 3.2）
+asyncpg>=0.29.0               # 异步PostgreSQL（如需要）
