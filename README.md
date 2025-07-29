@@ -289,7 +289,7 @@ graph TB
 
 ```bash
 # 1. 克隆项目
-git clone <repository-url>
+git clone https://github.com/yincma/AWS-BEDROCK-RAG.git
 cd system-2-aws-bedrock
 
 # 2. 部署基础设施
@@ -306,7 +306,7 @@ terraform apply -auto-approve
 # - S3数据源配置
 ```
 
-### 第三步：配置前端环境
+### 第三步：配置前端环境（可直接访问CloudFront代替此步骤）
 
 ```bash
 # 1. 回到项目根目录
@@ -335,8 +335,8 @@ npm start
 
 ### 1. 访问系统
 - 本地开发: http://localhost:3000
-- 生产环境: https://d3f5p9c6rqyzf7.cloudfront.net
-- API端点: https://vjywvai0e7.execute-api.us-east-1.amazonaws.com/dev
+- 生产环境: https://xxxx.cloudfront.net
+- API端点: https://xxxx.amazonaws.com/dev
 
 ### 2. 用户注册和登录
 - 首次使用需要注册账号
@@ -365,39 +365,7 @@ npm start
 
 当需要完全移除系统时，请按以下步骤操作：
 
-### 自动清理（推荐）
-./aws-cleanup.sh clean --prefix enterprise-rag --env dev --yes
-
-```bash
-# 创建清理脚本
-cat > destroy-system.sh << 'EOF'
-#!/bin/bash
-set -e
-
-echo "⚠️  警告：此操作将删除所有系统资源！"
-echo "按 Ctrl+C 取消，或按回车继续..."
-read
-
-# 1. 清理前端资源
-echo "🧹 清理前端资源..."
-cd applications/frontend
-rm -rf node_modules build
-
-# 2. 返回terraform目录
-cd ../../infrastructure/terraform
-
-# 3. 销毁所有Terraform管理的资源
-echo "🗑️  销毁AWS资源..."
-terraform destroy -auto-approve
-
-echo "✅ 清理完成！"
-EOF
-
-chmod +x destroy-system.sh
-./destroy-system.sh
-```
-
-### 手动清理步骤
+### 手动清理步骤（推荐）
 
 如果自动清理失败，请按以下步骤手动清理：
 
@@ -420,10 +388,10 @@ aws s3 ls | grep enterprise-rag
 
 # 4. 清理Bedrock Knowledge Base（如果需要）
 # aws bedrock-agent delete-data-source \
-#   --knowledge-base-id BKNE4DE9PO \
+#   --knowledge-base-id XXXXX \
 #   --data-source-id U9KR3CVD7H
 # aws bedrock-agent delete-knowledge-base \
-#   --knowledge-base-id BKNE4DE9PO
+#   --knowledge-base-id XXXXX
 ```
 
 ### 验证清理
@@ -694,12 +662,12 @@ aws cloudwatch put-metric-alarm \
 aws logs tail /aws/lambda/enterprise-rag-query-handler-dev --follow
 
 # 查看Knowledge Base状态
-aws bedrock-agent get-knowledge-base --knowledge-base-id BKNE4DE9PO
+aws bedrock-agent get-knowledge-base --knowledge-base-id xxxxx
 
 # 查看数据源同步状态
 aws bedrock-agent list-ingestion-jobs \
-  --knowledge-base-id BKNE4DE9PO \
-  --data-source-id U9KR3CVD7H
+  --knowledge-base-id xxxxx \
+  --data-source-id xxxxxx
 
 # 查看API Gateway指标
 aws cloudwatch get-metric-statistics \
@@ -808,14 +776,6 @@ npm run test:e2e
 cd infrastructure/terraform
 terraform validate
 terraform plan
-
-# 测试特定API端点
-curl -H "Authorization: Bearer YOUR_ID_TOKEN" \
-  https://vjywvai0e7.execute-api.us-east-1.amazonaws.com/dev/documents
-
-# 检查Knowledge Base状态
-aws bedrock-agent get-knowledge-base \
-  --knowledge-base-id CY2M1N3MQM
 ```
 
 ## 📚 项目结构
@@ -854,15 +814,6 @@ system-2-aws-bedrock/
 - Cognito配置需要手动同步环境变量
 - 大文件上传可能超时（建议<50MB）
 
-### 计划改进
-- [ ] 实现更精确的文档块统计
-- [ ] 添加文档预览功能
-- [ ] 支持更多文档格式（如Excel、PPT）
-- [ ] 实现对话历史记录保存
-- [ ] 添加多语言支持
-- [ ] 优化向量搜索性能
-- [ ] 实现细粒度的访问控制
-
 ## 🤝 贡献指南
 
 1. Fork项目
@@ -878,8 +829,6 @@ MIT License
 ## 📞 支持
 
 - 问题报告: GitHub Issues
-- 文档: 查看 `docs/` 目录
-- 架构图: `docs/architecture/`
 
 ---
 
@@ -887,17 +836,6 @@ MIT License
 **最后更新**: 2025-07-29  
 **状态**: 生产就绪
 
-## 🔑 关键资源ID
-
-- **Knowledge Base ID**: CY2M1N3MQM
-- **Data Source ID**: ICVLMBD5AZ
-- **OpenSearch Collection**: arn:aws:aoss:us-east-1:908103258316:collection/ysqfr0s5n0yq9mxmu4hl
-- **API Gateway**: vjywvai0e7
-- **CloudFront Distribution**: E1YO6CLHQ5RC6Q
-- **S3 Frontend Bucket**: enterprise-rag-frontend-dev-4cd5c202
-- **S3 Document Bucket**: enterprise-rag-documents-dev-60a64a52
-- **Cognito User Pool**: us-east-1_eWwwtNJ75
-- **Cognito Client ID**: 5ge6g7a8fd44ipk39r9nl7mbu1
 ## 🧹 AWS 资源管理
 
 ### 统一清理脚本
@@ -914,8 +852,6 @@ MIT License
 ./aws-cleanup.sh
 ```
 
-详细使用说明请参考 [CLEANUP_GUIDE.md](./CLEANUP_GUIDE.md)
-
 ---
 
 ### 📝 文档版本历史
@@ -927,8 +863,4 @@ MIT License
 | v2.0.0 | 2025-07-25 | - 初始版本发布<br/>- 基础RAG功能实现 |
 
 ### 🎯 快速链接
-
-- 🌐 **生产环境**: https://d3f5p9c6rqyzf7.cloudfront.net
-- 📚 **API文档**: https://vjywvai0e7.execute-api.us-east-1.amazonaws.com/dev
-- 🧪 **认证测试**: https://d3f5p9c6rqyzf7.cloudfront.net/auth-test
-- 📊 **AWS控制台**: [Bedrock Knowledge Base](https://console.aws.amazon.com/bedrock/home#/knowledge-bases/CY2M1N3MQM)
+- 🧪 **认证测试**: https://xxxxxx.cloudfront.net/auth-test
