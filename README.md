@@ -34,7 +34,7 @@ This is an enterprise-grade RAG (Retrieval-Augmented Generation) knowledge Q&A s
 - 🏗️ **Architecture Optimization Complete**: Unified module directory structure, Cognito as independent module
 - ✅ **Bedrock Knowledge Base Integration**: Successfully implemented Terraform auto-deployment
 - 🔧 **OpenSearch Index Auto-creation**: Resolved limitations through Lambda custom resources
-- 📊 **Knowledge Base ID**: CY2M1N3MQM | **Data Source ID**: ICVLMBD5AZ
+- 📊 **Knowledge Base ID**: xxxxx | **Data Source ID**: xxxxx
 
 ### Core Features
 - 🧠 **AI Q&A System**: Based on Amazon Bedrock Nova Pro model
@@ -74,7 +74,7 @@ graph TB
     QueryLambda --> KBQuery[Knowledge Base<br/>Query API]
     
     subgraph Bedrock Knowledge Base
-        DataSource[Data Source<br/>ICVLMBD5AZ]
+        DataSource[Data Source<br/>xxxxx]
         OpenSearch[(OpenSearch<br/>Serverless<br/>Vector DB)]
         TitanEmbed[Titan Embeddings<br/>G1 Model]
         NovaModel[Nova Pro<br/>LLM Model]
@@ -532,13 +532,13 @@ If documents are not properly indexed:
 ```bash
 # Manually trigger data source sync
 aws bedrock-agent start-ingestion-job \
-  --knowledge-base-id CY2M1N3MQM \
-  --data-source-id ICVLMBD5AZ
+  --knowledge-base-id xxxxx \
+  --data-source-id xxxxx
 
 # Check sync status
 aws bedrock-agent list-ingestion-jobs \
-  --knowledge-base-id CY2M1N3MQM \
-  --data-source-id ICVLMBD5AZ \
+  --knowledge-base-id xxxx \
+  --data-source-id xxxx \
   --max-results 5
 ```
 

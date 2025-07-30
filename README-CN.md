@@ -34,7 +34,7 @@
 - 🏗️ **架构优化完成**: 统一模块目录结构，Cognito独立成模块
 - ✅ **Bedrock Knowledge Base集成**: 成功实现Terraform自动部署
 - 🔧 **OpenSearch索引自动创建**: 通过Lambda自定义资源解决限制
-- 📊 **知识库ID**: CY2M1N3MQM | **数据源ID**: ICVLMBD5AZ
+- 📊 **知识库ID**: xxxxx | **数据源ID**: xxxxx
 
 ### 核心特性
 - 🧠 **AI问答系统**: 基于Amazon Bedrock Nova Pro模型
@@ -74,7 +74,7 @@ graph TB
     QueryLambda --> KBQuery[Knowledge Base<br/>Query API]
     
     subgraph Bedrock Knowledge Base
-        DataSource[Data Source<br/>ICVLMBD5AZ]
+        DataSource[Data Source<br/>xxxxx]
         OpenSearch[(OpenSearch<br/>Serverless<br/>Vector DB)]
         TitanEmbed[Titan Embeddings<br/>G1 Model]
         NovaModel[Nova Pro<br/>LLM Model]
@@ -532,13 +532,13 @@ aws apigateway create-deployment --rest-api-id YOUR_API_ID --stage-name dev
 ```bash
 # 手动触发数据源同步
 aws bedrock-agent start-ingestion-job \
-  --knowledge-base-id CY2M1N3MQM \
-  --data-source-id ICVLMBD5AZ
+  --knowledge-base-id xxxxx \
+  --data-source-id xxxxx
 
 # 检查同步状态
 aws bedrock-agent list-ingestion-jobs \
-  --knowledge-base-id CY2M1N3MQM \
-  --data-source-id ICVLMBD5AZ \
+  --knowledge-base-id xxxxx \
+  --data-source-id xxxxx \
   --max-results 5
 ```
 
